@@ -1,0 +1,21 @@
+apiVersion: v2
+name: arc-insights
+description: Open-source BI and embedded analytics — connect, query, dashboard, embed.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+home: https://arcinsights.io
+sources:
+  - https://github.com/ixSurendra/arc-insights
+maintainers:
+  - name: Arc Insights team
+    email: hello@arcinsights.io
+keywords:
+  - bi
+  - analytics
+  - dashboards
+  - embed
+  - duckdb
+  - elysia
+  - bun
+icon: https://arcinsights.io/icon.png

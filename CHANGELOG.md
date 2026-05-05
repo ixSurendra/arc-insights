@@ -32,6 +32,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 - PROGRESS.md: 16 Phase-0 tasks flipped to ✓ Done after CI went green on c2a1952. Phase 0 now 16/22; remaining: P0-02 (LICENSE), P0-14 (Helm), P0-16 (OTel), P0-18 (docs site), P0-20 (Playwright), P0-22 (EXIT review). 6 of 10 Phase-0 exit criteria now satisfied.
 - LICENSE: replaced 26-line stub with the full 661-line AGPLv3 text from gnu.org/licenses/agpl-3.0.txt (P0-02). Phase 0 now 17/22.
 - Playwright E2E suite: `frontend/playwright.config.ts` + `frontend/e2e/health.spec.ts` boot the backend and Vite via `webServer`, then assert that `/` renders the SDK-fetched health JSON. CI gets a new `e2e` job that installs Chromium and uploads a report artifact on failure (P0-20). Phase 0 now 18/22.
+- Helm chart skeleton at `helm/`: Chart.yaml, values.yaml, templates/{deployment,service,\_helpers.tpl}, .helmignore. Deployment runs as non-root with read-only rootfs and probes `/health`; Service exposes :3000. BYO Postgres + Valkey via `env`. Production HA build-out (multi-replica, bundled subcharts, BYOK, license keys) is P4-01. P0-14 done — Phase 0 now 19/22.
 
 ### Deprecated
 

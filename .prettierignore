@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build artifacts
+dist/
+build/
+.turbo/
+**/dist/
+**/build/
+
+# Test artifacts
+coverage/
+playwright-report/
+test-results/
+
+# Lockfiles
+bun.lock
+package-lock.json
+
+# Helm templates use Go templating ({{ ... }}) that isn't valid YAML
+helm/templates/
+
+# Generated / vendored
+LICENSE

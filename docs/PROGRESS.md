@@ -13,7 +13,7 @@ Live status of every task in the build plan. Update as you work.
 
 | Phase                            | Window      | Done | Total | Status      |
 | -------------------------------- | ----------- | ---- | ----- | ----------- |
-| **Phase 0** Foundation           | Weeks 1–2   | 18   | 22    | In Progress |
+| **Phase 0** Foundation           | Weeks 1–2   | 19   | 22    | In Progress |
 | **Phase 1** Core MVP             | Months 1–3  | 0    | 14    | Not started |
 | **Phase 2** Production-ready     | Months 3–5  | 0    | 8     | Not started |
 | **Phase 3** Multi-tenant + Embed | Months 5–7  | 0    | 10    | Not started |
@@ -29,34 +29,34 @@ Live status of every task in the build plan. Update as you work.
 
 **Goal:** Empty repo → working dev loop. CI green. Air-gapped install passes.
 
-| Task ID | Task                                                           | Owner | Sprint | Status | Linked PR / commit | Notes                                     |
-| ------- | -------------------------------------------------------------- | ----- | ------ | ------ | ------------------ | ----------------------------------------- |
-| P0-01   | Initialize git repo + GitHub org                               | Solo  | Wk 1   | ✓      | 6e5ba77            | github.com/ixSurendra/arc-insights        |
-| P0-02   | Pick + commit LICENSE (AGPLv3)                                 | Solo  | Wk 1   | ✓      | (this commit)      | Full text from gnu.org/licenses/agpl-3.0  |
-| P0-03   | Bun monorepo with /backend, /frontend, /sdk, /helm, /docs      | BE    | Wk 1   | ✓      | 6e5ba77            |                                           |
-| P0-04   | Pin Bun version in `.tool-versions` and Dockerfile             | BE    | Wk 1   | ✓      | df1f94a            | Bun 1.1.34 in both                        |
-| P0-05   | TypeScript strict + ESLint + Prettier + Husky                  | FE    | Wk 1   | ✓      | ef8d0bf            | flat config + lint-staged + prettier      |
-| P0-06   | Bootstrap Elysia backend with `/health` route                  | BE    | Wk 1   | ✓      | 6e5ba77            |                                           |
-| P0-07   | Bootstrap React + Vite frontend                                | FE    | Wk 1   | ✓      | 6e5ba77            |                                           |
-| P0-08   | Wire Elysia + React via Eden Treaty                            | BE+FE | Wk 1   | ✓      | df1f94a            | SDK uses window.location.origin           |
-| P0-09   | Drizzle + Postgres; first migration with `users` + `tenant_id` | BE    | Wk 1   | ✓      | ef8d0bf            | RLS + app_user role + 5 adversarial tests |
-| P0-10   | Local docker-compose: Postgres + Valkey                        | BE    | Wk 1   | ✓      | 6e5ba77            |                                           |
-| P0-11   | `make dev` script                                              | BE    | Wk 1   | ✓      | 6e5ba77            | end-to-end verified                       |
-| P0-12   | GitHub Actions CI (lint, typecheck, test, Docker build)        | BE    | Wk 2   | ✓      | c2a1952            | first green run on c2a1952                |
-| P0-13   | Distroless Bun Dockerfile (multi-arch)                         | BE    | Wk 2   | ✓      | c2a1952            | amd64 + arm64 both pass                   |
-| P0-14   | First Helm chart skeleton in `/helm`                           | BE    | Wk 2   | ☐      |                    |                                           |
-| P0-15   | Air-gapped install dry-run script in CI                        | BE    | Wk 2   | ✓      | c2a1952            | --network=none + log-grep probe           |
-| P0-16   | OpenTelemetry instrumentation skeleton                         | BE    | Wk 2   | ☐      |                    |                                           |
-| P0-17   | ADR template + first 3 ADRs (stack, license, multi-tenancy)    | Solo  | Wk 2   | ✓      | 6e5ba77            |                                           |
-| P0-18   | Public docs site stub (Mintlify or Nextra)                     | FE    | Wk 2   | ☐      |                    |                                           |
-| P0-19   | README, CONTRIBUTING, SECURITY, CODE_OF_CONDUCT                | Solo  | Wk 2   | ✓      | 6e5ba77            |                                           |
-| P0-20   | First Playwright E2E test                                      | FE    | Wk 2   | ✓      | (this commit)      | health.spec.ts; CI runs on every PR       |
-| P0-21   | Bun + DuckDB load-test spike (100 concurrent queries)          | BE    | Wk 2   | ✓      | c2a1952            | p99 838 ms vs 8 s budget — Bun stays      |
-| P0-22   | Phase 0 EXIT review                                            | Solo  | Wk 2   | ☐      |                    |                                           |
+| Task ID | Task                                                           | Owner | Sprint | Status | Linked PR / commit | Notes                                      |
+| ------- | -------------------------------------------------------------- | ----- | ------ | ------ | ------------------ | ------------------------------------------ |
+| P0-01   | Initialize git repo + GitHub org                               | Solo  | Wk 1   | ✓      | 6e5ba77            | github.com/ixSurendra/arc-insights         |
+| P0-02   | Pick + commit LICENSE (AGPLv3)                                 | Solo  | Wk 1   | ✓      | (this commit)      | Full text from gnu.org/licenses/agpl-3.0   |
+| P0-03   | Bun monorepo with /backend, /frontend, /sdk, /helm, /docs      | BE    | Wk 1   | ✓      | 6e5ba77            |                                            |
+| P0-04   | Pin Bun version in `.tool-versions` and Dockerfile             | BE    | Wk 1   | ✓      | df1f94a            | Bun 1.1.34 in both                         |
+| P0-05   | TypeScript strict + ESLint + Prettier + Husky                  | FE    | Wk 1   | ✓      | ef8d0bf            | flat config + lint-staged + prettier       |
+| P0-06   | Bootstrap Elysia backend with `/health` route                  | BE    | Wk 1   | ✓      | 6e5ba77            |                                            |
+| P0-07   | Bootstrap React + Vite frontend                                | FE    | Wk 1   | ✓      | 6e5ba77            |                                            |
+| P0-08   | Wire Elysia + React via Eden Treaty                            | BE+FE | Wk 1   | ✓      | df1f94a            | SDK uses window.location.origin            |
+| P0-09   | Drizzle + Postgres; first migration with `users` + `tenant_id` | BE    | Wk 1   | ✓      | ef8d0bf            | RLS + app_user role + 5 adversarial tests  |
+| P0-10   | Local docker-compose: Postgres + Valkey                        | BE    | Wk 1   | ✓      | 6e5ba77            |                                            |
+| P0-11   | `make dev` script                                              | BE    | Wk 1   | ✓      | 6e5ba77            | end-to-end verified                        |
+| P0-12   | GitHub Actions CI (lint, typecheck, test, Docker build)        | BE    | Wk 2   | ✓      | c2a1952            | first green run on c2a1952                 |
+| P0-13   | Distroless Bun Dockerfile (multi-arch)                         | BE    | Wk 2   | ✓      | c2a1952            | amd64 + arm64 both pass                    |
+| P0-14   | First Helm chart skeleton in `/helm`                           | BE    | Wk 2   | ✓      | (this commit)      | Deployment + Service; HA buildout in P4-01 |
+| P0-15   | Air-gapped install dry-run script in CI                        | BE    | Wk 2   | ✓      | c2a1952            | --network=none + log-grep probe            |
+| P0-16   | OpenTelemetry instrumentation skeleton                         | BE    | Wk 2   | ☐      |                    |                                            |
+| P0-17   | ADR template + first 3 ADRs (stack, license, multi-tenancy)    | Solo  | Wk 2   | ✓      | 6e5ba77            |                                            |
+| P0-18   | Public docs site stub (Mintlify or Nextra)                     | FE    | Wk 2   | ☐      |                    |                                            |
+| P0-19   | README, CONTRIBUTING, SECURITY, CODE_OF_CONDUCT                | Solo  | Wk 2   | ✓      | 6e5ba77            |                                            |
+| P0-20   | First Playwright E2E test                                      | FE    | Wk 2   | ✓      | (this commit)      | health.spec.ts; CI runs on every PR        |
+| P0-21   | Bun + DuckDB load-test spike (100 concurrent queries)          | BE    | Wk 2   | ✓      | c2a1952            | p99 838 ms vs 8 s budget — Bun stays       |
+| P0-22   | Phase 0 EXIT review                                            | Solo  | Wk 2   | ☐      |                    |                                            |
 
 ### Phase 0 Exit Criteria
 
-- [ ] All 22 Phase-0 tasks marked ✓ (18/22 done; remaining: P0-14, P0-16, P0-18, P0-22)
+- [ ] All 22 Phase-0 tasks marked ✓ (19/22 done; remaining: P0-16, P0-18, P0-22)
 - [x] `make dev` boots on a fresh machine in <5 minutes
 - [x] CI green on every PR (first green run: c2a1952)
 - [x] Distroless image builds for amd64 + arm64

@@ -1,0 +1,65 @@
+# Default values for the arc-insights Helm chart.
+# Phase 0 ships a skeleton; Phase 4 (P4-01) builds it out for production HA
+# (multi-replica, bundled Postgres subchart, BYOK, license keys, etc.).
+
+image:
+  repository: arc-insights
+  tag: dev
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 3000
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 512Mi
+
+# Application environment. Inject DATABASE_URL, CACHE_URL, secrets via
+# Helm --set or a values override. For Phase 0 the chart assumes BYO
+# Postgres + Valkey; Phase 4 will offer a bundled Postgres subchart.
+env: {}
+# Example:
+# env:
+#   DATABASE_URL: postgresql://arc:arc_dev@postgres:5432/arc_insights
+#   CACHE_URL: redis://valkey:6379
+#   SESSION_SECRET: change-me
+
+# Probes hit the same /health route the dev server serves.
+healthCheck:
+  livenessPath: /health
+  readinessPath: /health
+
+# Optional ingress (off by default — most embed customers terminate TLS upstream).
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: arc-insights.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+# Pod-level controls
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
