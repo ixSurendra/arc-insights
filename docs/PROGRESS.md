@@ -13,7 +13,7 @@ Live status of every task in the build plan. Update as you work.
 
 | Phase                            | Window      | Done | Total | Status      |
 | -------------------------------- | ----------- | ---- | ----- | ----------- |
-| **Phase 0** Foundation           | Weeks 1–2   | 16   | 22    | In Progress |
+| **Phase 0** Foundation           | Weeks 1–2   | 17   | 22    | In Progress |
 | **Phase 1** Core MVP             | Months 1–3  | 0    | 14    | Not started |
 | **Phase 2** Production-ready     | Months 3–5  | 0    | 8     | Not started |
 | **Phase 3** Multi-tenant + Embed | Months 5–7  | 0    | 10    | Not started |
@@ -32,7 +32,7 @@ Live status of every task in the build plan. Update as you work.
 | Task ID | Task                                                           | Owner | Sprint | Status | Linked PR / commit | Notes                                     |
 | ------- | -------------------------------------------------------------- | ----- | ------ | ------ | ------------------ | ----------------------------------------- |
 | P0-01   | Initialize git repo + GitHub org                               | Solo  | Wk 1   | ✓      | 6e5ba77            | github.com/ixSurendra/arc-insights        |
-| P0-02   | Pick + commit LICENSE (AGPLv3)                                 | Solo  | Wk 1   | ☐      |                    | Replace stub with full text from gnu.org  |
+| P0-02   | Pick + commit LICENSE (AGPLv3)                                 | Solo  | Wk 1   | ✓      | (this commit)      | Full text from gnu.org/licenses/agpl-3.0  |
 | P0-03   | Bun monorepo with /backend, /frontend, /sdk, /helm, /docs      | BE    | Wk 1   | ✓      | 6e5ba77            |                                           |
 | P0-04   | Pin Bun version in `.tool-versions` and Dockerfile             | BE    | Wk 1   | ✓      | df1f94a            | Bun 1.1.34 in both                        |
 | P0-05   | TypeScript strict + ESLint + Prettier + Husky                  | FE    | Wk 1   | ✓      | ef8d0bf            | flat config + lint-staged + prettier      |
@@ -56,7 +56,7 @@ Live status of every task in the build plan. Update as you work.
 
 ### Phase 0 Exit Criteria
 
-- [ ] All 22 Phase-0 tasks marked ✓ (16/22 done; remaining: P0-02, P0-14, P0-16, P0-18, P0-20, P0-22)
+- [ ] All 22 Phase-0 tasks marked ✓ (17/22 done; remaining: P0-14, P0-16, P0-18, P0-20, P0-22)
 - [x] `make dev` boots on a fresh machine in <5 minutes
 - [x] CI green on every PR (first green run: c2a1952)
 - [x] Distroless image builds for amd64 + arm64
