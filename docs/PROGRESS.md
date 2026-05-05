@@ -14,7 +14,7 @@ Live status of every task in the build plan. Update as you work.
 | Phase                            | Window      | Done | Total | Status      |
 | -------------------------------- | ----------- | ---- | ----- | ----------- |
 | **Phase 0** Foundation           | Weeks 1–2   | 22   | 22    | ✓ Done      |
-| **Phase 1** Core MVP             | Months 1–3  | 2    | 14    | In Progress |
+| **Phase 1** Core MVP             | Months 1–3  | 3    | 14    | In Progress |
 | **Phase 2** Production-ready     | Months 3–5  | 0    | 8     | Not started |
 | **Phase 3** Multi-tenant + Embed | Months 5–7  | 0    | 10    | Not started |
 | **Phase 4** On-prem + Air-gapped | Months 7–9  | 0    | 9     | Not started |
@@ -81,7 +81,7 @@ Live status of every task in the build plan. Update as you work.
 | P1-04   | Snowflake connector                                                | BE    | M2     | ☐      |
 | P1-05   | Visual no-code query builder (UI + JSON spec)                      | FE    | M1-M2  | ☐      |
 | P1-06   | Raw SQL editor with autocomplete                                   | FE    | M2     | ☐      |
-| P1-07   | Query → SQL compiler + DuckDB result shaping                       | BE    | M1-M2  | ☐      |
+| P1-07   | Query → SQL compiler + DuckDB result shaping                       | BE    | M1-M2  | ✓      |
 | P1-08   | Chart types: line/bar/pie/table/big number/scatter                 | FE    | M2     | ☐      |
 | P1-09   | Dashboard grid + global filters                                    | FE    | M2-M3  | ☐      |
 | P1-10   | Save / share / fork queries + dashboards                           | FE+BE | M3     | ☐      |
