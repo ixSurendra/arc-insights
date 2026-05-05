@@ -2,6 +2,7 @@
   "name": "arc-insights",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "Open-source BI and embedded analytics. Connect, query, dashboard, embed.",
   "homepage": "https://arcinsights.io",
   "repository": {

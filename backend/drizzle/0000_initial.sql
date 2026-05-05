@@ -45,6 +45,22 @@ CREATE TABLE IF NOT EXISTS audit_log (
 );
 CREATE INDEX IF NOT EXISTS audit_tenant_created_idx ON audit_log(tenant_id, created_at);
 
+-- ─── Application role (non-superuser) ──────────────────────────────
+-- The connection user (arc) is the Postgres superuser, which bypasses RLS.
+-- Application code drops to app_user inside withTenant() via SET LOCAL ROLE,
+-- making the row-level policies actually load-bearing. NOLOGIN — app_user is
+-- only reachable via SET ROLE from a privileged session, never directly.
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'app_user') THEN
+    CREATE ROLE app_user NOLOGIN;
+  END IF;
+END
+$$;
+
+GRANT USAGE ON SCHEMA public TO app_user;
+GRANT SELECT, INSERT, UPDATE, DELETE ON tenants, users, audit_log TO app_user;
+
 -- ─── Row-Level Security ─────────────────────────────────────────────
 -- Reads/writes filtered by app.tenant_id. The 'true' second argument to
 -- current_setting makes it return NULL instead of erroring when unset —

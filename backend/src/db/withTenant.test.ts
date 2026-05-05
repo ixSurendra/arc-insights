@@ -46,18 +46,27 @@ describe.skipIf(!DB_AVAILABLE)(
       await db.execute(sql`TRUNCATE audit_log, users RESTART IDENTITY CASCADE`);
     });
 
-    test("a query without withTenant() sees zero rows (RLS denies by default)", async () => {
-      // Insert a user as the admin role, bypassing the tenant context, then
-      // verify that a regular SELECT (still admin role) returns nothing because
-      // app.tenant_id is unset → current_setting returns NULL → predicate is false.
+    test("a query as app_user without app.tenant_id sees zero rows", async () => {
+      // Insert a row through the proper path so there's something to (not) see.
       await withTenant(tenantA, async (tx) => {
         await tx
           .insert(schema.users)
           .values({ tenantId: tenantA, email: "a@example.com" });
       });
 
-      const rows = await db.select().from(schema.users);
-      expect(rows.length).toBe(0);
+      // Now run a SELECT as app_user without binding app.tenant_id. The RLS
+      // policy condition `tenant_id::text = current_setting('app.tenant_id', true)`
+      // evaluates to NULL (treated as false), so app_user sees zero rows. This
+      // is the safe-default behaviour that makes "I forgot withTenant()" benign.
+      const rowsAsApp = await db.transaction(async (tx) => {
+        await tx.execute(sql`SET LOCAL ROLE app_user`);
+        return tx.select().from(schema.users);
+      });
+      expect(rowsAsApp.length).toBe(0);
+
+      // As a sanity check, the superuser DOES see the row (RLS bypass).
+      const rowsAsAdmin = await db.select().from(schema.users);
+      expect(rowsAsAdmin.length).toBe(1);
     });
 
     test("withTenant(A) sees only tenant A rows", async () => {

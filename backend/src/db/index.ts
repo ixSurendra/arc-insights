@@ -31,6 +31,12 @@ const queryClient = postgres(databaseUrl, {
 export const db = drizzle(queryClient, { schema });
 
 /**
+ * The transaction handle Drizzle gives us inside `db.transaction(...)`.
+ * Inferred so we don't depend on Drizzle's deep generics directly.
+ */
+type DbTx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+/**
  * Run a callback in a transaction with the tenant context set.
  * All Postgres RLS policies will see `app.tenant_id` = tenantId.
  *
@@ -41,7 +47,7 @@ export const db = drizzle(queryClient, { schema });
  */
 export async function withTenant<T>(
   tenantId: string,
-  fn: (tx: typeof db) => Promise<T>,
+  fn: (tx: DbTx) => Promise<T>,
 ): Promise<T> {
   return db.transaction(async (tx) => {
     // Bind the tenant for the duration of this transaction. `set_config(..., true)`
@@ -50,6 +56,10 @@ export async function withTenant<T>(
     await tx.execute(
       sql`SELECT set_config('app.tenant_id', ${tenantId}, true)`,
     );
+    // Drop privileges to the non-superuser application role so RLS policies
+    // actually apply. SET LOCAL reverts on COMMIT/ROLLBACK; the connection
+    // returns to its base role (typically the migration superuser).
+    await tx.execute(sql`SET LOCAL ROLE app_user`);
     return fn(tx);
   });
 }

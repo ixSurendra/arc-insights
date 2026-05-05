@@ -73,6 +73,9 @@
         "@elysiajs/eden": "^1.1.0",
         "elysia": "^1.1.0",
       },
+      "devDependencies": {
+        "@arc-insights/backend": "workspace:*",
+      },
     },
   },
   "packages": {

@@ -12,7 +12,7 @@ import { swagger } from "@elysiajs/swagger";
 
 const PORT = Number(process.env.PORT ?? 3000);
 
-const app = new Elysia()
+const _app = new Elysia()
   .use(cors())
   .use(
     swagger({
@@ -51,8 +51,8 @@ const app = new Elysia()
   )
   .listen(PORT);
 
-console.log(`🚀 Arc Insights API listening on http://localhost:${PORT}`);
-console.log(`📚 API docs at http://localhost:${PORT}/docs`);
+console.info(`🚀 Arc Insights API listening on http://localhost:${PORT}`);
+console.info(`📚 API docs at http://localhost:${PORT}/docs`);
 
 // Export the app type so the SDK package can consume it via Eden Treaty
-export type App = typeof app;
+export type App = typeof _app;

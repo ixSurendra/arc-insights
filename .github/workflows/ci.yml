@@ -58,9 +58,8 @@ jobs:
           bun-version: ${{ env.BUN_VERSION }}
       - run: bun install --frozen-lockfile
       - name: Apply initial migration (schema + RLS)
-        run: |
-          sudo apt-get update && sudo apt-get install -y --no-install-recommends postgresql-client
-          psql "$DATABASE_URL" -f backend/drizzle/0000_initial.sql
+        working-directory: backend
+        run: bun run db:bootstrap
       - name: Run tests (includes cross-tenant adversarial suite)
         run: bun run --filter '*' test
 
