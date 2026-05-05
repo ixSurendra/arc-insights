@@ -8,12 +8,17 @@
 
 ARG BUN_VERSION=1.1.34
 
+# ─── Bun binary stage ─────────────────────────────────────────────
+# Named stage so the runtime stage can COPY from it without needing ARG
+# expansion in --from (BuildKit doesn't substitute ARG in --from references).
+FROM oven/bun:${BUN_VERSION}-distroless AS bun-runtime
+
 # ─── Builder ──────────────────────────────────────────────────────
 FROM oven/bun:${BUN_VERSION}-alpine AS builder
 WORKDIR /app
 
 # Copy manifests first for better layer caching
-COPY package.json bun.lockb* ./
+COPY package.json bun.lock* ./
 COPY backend/package.json ./backend/
 COPY frontend/package.json ./frontend/
 COPY sdk/package.json ./sdk/
@@ -33,8 +38,9 @@ RUN bun run --filter '@arc-insights/backend' build
 FROM gcr.io/distroless/base-debian12:nonroot AS runtime
 WORKDIR /app
 
-# Bun runtime binary
-COPY --from=oven/bun:${BUN_VERSION}-distroless /usr/local/bin/bun /usr/local/bin/bun
+# Bun runtime binary (from the named stage above so ARG expansion is not
+# required at this COPY)
+COPY --from=bun-runtime /usr/local/bin/bun /usr/local/bin/bun
 
 # Built artifacts
 COPY --from=builder /app/backend/dist ./backend/dist

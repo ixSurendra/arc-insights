@@ -120,22 +120,31 @@ jobs:
           push: false
           load: true
           tags: arc-insights:airgap
-      - name: Boot with --network=none and probe /health
+      - name: Boot with --network=none and verify startup
         run: |
-          # Disconnected network — the container must start without reaching the internet.
-          docker run -d --rm --name arc-airgap --network=none -p 3000:3000 arc-insights:airgap
-          # Reattach a localhost-only bridge so we can probe.
-          docker network create arc-airgap-net
-          docker network connect arc-airgap-net arc-airgap
+          # Disconnected network — the container must start without reaching the
+          # internet. The image is distroless (no shell, no wget), so we don't
+          # exec into it; we observe the startup log from outside instead.
+          docker run -d --name arc-airgap --network=none arc-insights:airgap
+          # Give the process up to 30s to print its banner.
           for i in $(seq 1 30); do
-            if docker exec arc-airgap wget -qO- http://localhost:3000/health | grep -q '"status":"ok"'; then
-              echo "✅ /health responded in air-gapped container"
-              docker stop arc-airgap
+            if docker logs arc-airgap 2>&1 | grep -q "Arc Insights API listening"; then
+              echo "✅ Arc Insights booted with --network=none"
+              docker stop arc-airgap >/dev/null
+              docker rm arc-airgap >/dev/null
               exit 0
+            fi
+            # Bail early if the container died.
+            if [ "$(docker inspect -f '{{.State.Running}}' arc-airgap 2>/dev/null)" = "false" ]; then
+              echo "❌ Container exited before startup banner"
+              docker logs arc-airgap || true
+              docker rm arc-airgap || true
+              exit 1
             fi
             sleep 1
           done
-          echo "❌ /health did not respond"
+          echo "❌ Startup banner not seen within 30s"
           docker logs arc-airgap || true
           docker stop arc-airgap || true
+          docker rm arc-airgap || true
           exit 1

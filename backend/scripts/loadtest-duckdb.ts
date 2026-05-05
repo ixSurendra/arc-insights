@@ -128,7 +128,10 @@ async function main(): Promise<void> {
   }
   console.info(`\n✅ PASS — p99 ${stats.p99Ms}ms ≤ ${PASS_P99_MS}ms`);
 
-  await db.close();
+  // Skip db.close() — duckdb-async + Bun race during shutdown and emit a
+  // misleading SIGTRAP after the test has already passed. process.exit ensures
+  // we don't crash with a non-zero status on the way out.
+  process.exit(0);
 }
 
 main().catch((err: unknown) => {

@@ -29,9 +29,9 @@ execution tier to a separate Go service before P3 ships.
 > Append a row each time you run the spike. Treat regressions across rows as
 > a signal worth investigating.
 
-| Date  | Hardware  | Bun    | DuckDB | Concurrency | Queries |      Rows | Wall (ms) | QPS | p50 | p95 | p99 | Verdict   |
-| ----- | --------- | ------ | ------ | ----------: | ------: | --------: | --------: | --: | --: | --: | --: | --------- |
-| _TBD_ | _machine_ | 1.1.34 | _ver_  |         100 |     500 | 1,000,000 |       _–_ | _–_ | _–_ | _–_ | _–_ | _pending_ |
+| Date       | Hardware               | Bun    | DuckDB                   | Concurrency | Queries |      Rows | Wall (ms) | QPS | p50 | p95 | p99 | Verdict                           |
+| ---------- | ---------------------- | ------ | ------------------------ | ----------: | ------: | --------: | --------: | --: | --: | --: | --: | --------------------------------- |
+| 2026-05-06 | macOS arm64 (M-series) | 1.3.12 | 1.4.2 (via duckdb-async) |         100 |     500 | 1,000,000 |     2,334 | 214 | 393 | 792 | 838 | ✅ PASS (p99 838 ms ≤ 8 s budget) |
 
 ## What this spike does _not_ cover
 
