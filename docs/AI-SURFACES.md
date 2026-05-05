@@ -21,110 +21,110 @@ Where AI is used in Arc Insights, what data flows where, and how it works in air
 
 ### Onboarding / setup
 
-| Surface | What it does | Inputs to LLM | Priority |
-|---|---|---|---|
-| **AI-suggested starter dashboards** | Reads the customer's schema and proposes 3–5 sensible starter dashboards. | Schema metadata only (table + column names + types + sample row counts). NEVER raw data. | P2 |
-| **Schema understanding / entity detection** | Detects probable foreign keys, entity relationships, translation tables. | Schema metadata. | P2 |
-| **Auto-tag PII columns** | Flags columns likely to contain PII (email, phone, SSN, names) so admins can mask them. | Column names + sampled regex patterns (no actual values). | P2 |
-| **dbt manifest enrichment** | Generates plain-English descriptions for dbt models that lack them. | Model name, column names, source SQL. | P3 |
+| Surface                                     | What it does                                                                            | Inputs to LLM                                                                            | Priority |
+| ------------------------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | -------- |
+| **AI-suggested starter dashboards**         | Reads the customer's schema and proposes 3–5 sensible starter dashboards.               | Schema metadata only (table + column names + types + sample row counts). NEVER raw data. | P2       |
+| **Schema understanding / entity detection** | Detects probable foreign keys, entity relationships, translation tables.                | Schema metadata.                                                                         | P2       |
+| **Auto-tag PII columns**                    | Flags columns likely to contain PII (email, phone, SSN, names) so admins can mask them. | Column names + sampled regex patterns (no actual values).                                | P2       |
+| **dbt manifest enrichment**                 | Generates plain-English descriptions for dbt models that lack them.                     | Model name, column names, source SQL.                                                    | P3       |
 
 ### Query building
 
-| Surface | What it does | Inputs to LLM | Priority |
-|---|---|---|---|
-| **NL → SQL (NL Q&A)** ★ | User types "show me revenue by region last quarter"; product compiles to SQL via the semantic layer. | User question + relevant subset of semantic layer (metric/dimension definitions). NO data rows. | P2 |
-| **AI SQL pair-programmer** | Explain / fix / optimize SQL inline. | User's SQL + schema metadata. | P1 |
-| **Smart chart suggestions ("Show Me")** | Picks the best chart type based on result shape. Mostly rules-based with LLM fallback for edge cases. | Result shape — number of dimensions, cardinality, types. | P0 (rules) / P2 (LLM) |
-| **NL → cohort/funnel/retention** | User describes a question in English; product fills in the cohort/funnel builder. | User question + schema metadata. | P2 |
-| **Index / query plan suggestions** | Suggests indexes for slow queries on Postgres / MySQL. | Query plan + slow-query log. | P3 |
+| Surface                                 | What it does                                                                                          | Inputs to LLM                                                                                   | Priority              |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | --------------------- |
+| **NL → SQL (NL Q&A)** ★                 | User types "show me revenue by region last quarter"; product compiles to SQL via the semantic layer.  | User question + relevant subset of semantic layer (metric/dimension definitions). NO data rows. | P2                    |
+| **AI SQL pair-programmer**              | Explain / fix / optimize SQL inline.                                                                  | User's SQL + schema metadata.                                                                   | P1                    |
+| **Smart chart suggestions ("Show Me")** | Picks the best chart type based on result shape. Mostly rules-based with LLM fallback for edge cases. | Result shape — number of dimensions, cardinality, types.                                        | P0 (rules) / P2 (LLM) |
+| **NL → cohort/funnel/retention**        | User describes a question in English; product fills in the cohort/funnel builder.                     | User question + schema metadata.                                                                | P2                    |
+| **Index / query plan suggestions**      | Suggests indexes for slow queries on Postgres / MySQL.                                                | Query plan + slow-query log.                                                                    | P3                    |
 
 ### Dashboards
 
-| Surface | What it does | Inputs to LLM | Priority |
-|---|---|---|---|
-| **AI-generated chart from a question** ★ | User types a question; product produces a chart on the canvas. | Question + schema + applicable filters. | P2 |
-| **AI dashboard summary** | 3–5 sentence plain-English readout of what the dashboard shows. | Chart titles, current values, top movers (NOT raw rows). | P2 |
-| **"Why did X change?" explainer** ★ | Decomposes a metric movement across dimensions. "Revenue dropped 12% — driven by SKU-A churn in EU." | Aggregated values across dimensions (NOT raw rows). | P2 |
-| **Auto-generated chart alt text** | Accessibility — screen-reader-friendly chart descriptions. | Chart title + summary stats. | P2 |
+| Surface                                  | What it does                                                                                         | Inputs to LLM                                            | Priority |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | -------- |
+| **AI-generated chart from a question** ★ | User types a question; product produces a chart on the canvas.                                       | Question + schema + applicable filters.                  | P2       |
+| **AI dashboard summary**                 | 3–5 sentence plain-English readout of what the dashboard shows.                                      | Chart titles, current values, top movers (NOT raw rows). | P2       |
+| **"Why did X change?" explainer** ★      | Decomposes a metric movement across dimensions. "Revenue dropped 12% — driven by SKU-A churn in EU." | Aggregated values across dimensions (NOT raw rows).      | P2       |
+| **Auto-generated chart alt text**        | Accessibility — screen-reader-friendly chart descriptions.                                           | Chart title + summary stats.                             | P2       |
 
 ### Alerts & monitoring
 
-| Surface | What it does | Inputs to LLM | Priority |
-|---|---|---|---|
-| **Anomaly detection** ★ | Statistical core (z-scores, seasonal decomposition) + LLM annotation for human-readable notes. | Time-series of one metric + historical baseline. | P2 |
-| **Smart alert thresholds** | Reads metric history; suggests sensible thresholds. | Time-series of the metric. | P2 |
-| **Monitoring + acting agent** | Detects → diagnoses → proposes action → executes via integrations (Slack / Linear / PagerDuty / dbt). | Metric movement + dashboard context. | P3 |
+| Surface                       | What it does                                                                                          | Inputs to LLM                                    | Priority |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------ | -------- |
+| **Anomaly detection** ★       | Statistical core (z-scores, seasonal decomposition) + LLM annotation for human-readable notes.        | Time-series of one metric + historical baseline. | P2       |
+| **Smart alert thresholds**    | Reads metric history; suggests sensible thresholds.                                                   | Time-series of the metric.                       | P2       |
+| **Monitoring + acting agent** | Detects → diagnoses → proposes action → executes via integrations (Slack / Linear / PagerDuty / dbt). | Metric movement + dashboard context.             | P3       |
 
 ### Search & discovery
 
-| Surface | What it does | Inputs to LLM | Priority |
-|---|---|---|---|
-| **Semantic search across dashboards / metrics** | Search "churn" and find dashboards whose meanings match. | Search query + embeddings of dashboards & metrics (pre-computed). | P2 |
-| **Auto-generated metric descriptions** | Plain-English descriptions for metrics in the catalog. | Metric SQL + sample values. | P2 |
+| Surface                                         | What it does                                             | Inputs to LLM                                                     | Priority |
+| ----------------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------------------- | -------- |
+| **Semantic search across dashboards / metrics** | Search "churn" and find dashboards whose meanings match. | Search query + embeddings of dashboards & metrics (pre-computed). | P2       |
+| **Auto-generated metric descriptions**          | Plain-English descriptions for metrics in the catalog.   | Metric SQL + sample values.                                       | P2       |
 
 ### Data quality
 
-| Surface | What it does | Inputs to LLM | Priority |
-|---|---|---|---|
-| **Schema-drift auto-mapping** ★ | When a column is renamed, suggest the right new mapping with a confidence score. | Old + new schema metadata, similarity scores. | P2 |
-| **Outlier / data-quality flags** | Flag rows or aggregates that look anomalous. | Summary stats only. | P3 |
+| Surface                          | What it does                                                                     | Inputs to LLM                                 | Priority |
+| -------------------------------- | -------------------------------------------------------------------------------- | --------------------------------------------- | -------- |
+| **Schema-drift auto-mapping** ★  | When a column is renamed, suggest the right new mapping with a confidence score. | Old + new schema metadata, similarity scores. | P2       |
+| **Outlier / data-quality flags** | Flag rows or aggregates that look anomalous.                                     | Summary stats only.                           | P3       |
 
 ### Cost optimization
 
-| Surface | What it does | Inputs to LLM | Priority |
-|---|---|---|---|
-| **Auto-suggest pre-aggregations** ★ | Watches query patterns; recommends "these 3 patterns are 60% of your cost — materialize them". | Query history (anonymized: shapes only, no literals). | P2 |
+| Surface                             | What it does                                                                                   | Inputs to LLM                                         | Priority |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------- | -------- |
+| **Auto-suggest pre-aggregations** ★ | Watches query patterns; recommends "these 3 patterns are 60% of your cost — materialize them". | Query history (anonymized: shapes only, no literals). | P2       |
 
 ### Translation & i18n
 
-| Surface | What it does | Inputs to LLM | Priority |
-|---|---|---|---|
-| **Auto-translate metric labels** | When a customer adds Spanish, offer AI-translated labels for review. | Existing labels + target language. | P3 |
+| Surface                          | What it does                                                         | Inputs to LLM                      | Priority |
+| -------------------------------- | -------------------------------------------------------------------- | ---------------------------------- | -------- |
+| **Auto-translate metric labels** | When a customer adds Spanish, offer AI-translated labels for review. | Existing labels + target language. | P3       |
 
 ### Help / in-product assistant
 
-| Surface | What it does | Inputs to LLM | Priority |
-|---|---|---|---|
-| **Inline help that knows the schema** | Chat-style help grounded in the user's actual data. | User question + schema + product docs. | P2 |
-| **Onboarding tutor** | First-week interactive walk-through customized to the customer's data. | Schema + docs + user progress. | P3 |
+| Surface                               | What it does                                                           | Inputs to LLM                          | Priority |
+| ------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------- | -------- |
+| **Inline help that knows the schema** | Chat-style help grounded in the user's actual data.                    | User question + schema + product docs. | P2       |
+| **Onboarding tutor**                  | First-week interactive walk-through customized to the customer's data. | Schema + docs + user progress.         | P3       |
 
 ---
 
 ## Architecture components
 
-| Component | Tech | Purpose |
-|---|---|---|
-| **LLM endpoint (BYO)** | OpenAI / Anthropic / Azure OpenAI / Ollama / vLLM | Single OpenAI-compatible interface; customer picks the backend. |
-| **Orchestration** | Vercel AI SDK | TypeScript-first. Streaming, structured output, tool calls. Don't use LangChain — too heavy for narrow needs. |
-| **Embeddings** | OpenAI text-embedding-3-small (cloud) / nomic-embed-text via Ollama (air-gapped) | For semantic search and RAG grounding. |
-| **Vector store** | pgvector inside metadata Postgres | No new service. Stores embeddings of schemas, metric definitions, dashboard contents, docs. |
-| **Prompt grounding (RAG)** | Custom retriever | Before calling the LLM, fetch only the relevant slice of semantic layer + product docs. |
-| **Output validation** | Zod schemas on every LLM response | LLM outputs must match a schema (SQL must parse, chart configs must validate). Reject and retry on failure. |
-| **Caching** | Valkey | Cache LLM responses by (prompt + context-hash). Save cost + latency on repeated questions. |
-| **Rate limiting / budgets** | Per-tenant LLM token + cost caps | Stops one tenant from running up the OpenAI bill. Configurable by admin. |
-| **Observability** | OpenTelemetry spans for every LLM call | Track tokens, latency, cost, success rate per surface. |
+| Component                   | Tech                                                                             | Purpose                                                                                                       |
+| --------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **LLM endpoint (BYO)**      | OpenAI / Anthropic / Azure OpenAI / Ollama / vLLM                                | Single OpenAI-compatible interface; customer picks the backend.                                               |
+| **Orchestration**           | Vercel AI SDK                                                                    | TypeScript-first. Streaming, structured output, tool calls. Don't use LangChain — too heavy for narrow needs. |
+| **Embeddings**              | OpenAI text-embedding-3-small (cloud) / nomic-embed-text via Ollama (air-gapped) | For semantic search and RAG grounding.                                                                        |
+| **Vector store**            | pgvector inside metadata Postgres                                                | No new service. Stores embeddings of schemas, metric definitions, dashboard contents, docs.                   |
+| **Prompt grounding (RAG)**  | Custom retriever                                                                 | Before calling the LLM, fetch only the relevant slice of semantic layer + product docs.                       |
+| **Output validation**       | Zod schemas on every LLM response                                                | LLM outputs must match a schema (SQL must parse, chart configs must validate). Reject and retry on failure.   |
+| **Caching**                 | Valkey                                                                           | Cache LLM responses by (prompt + context-hash). Save cost + latency on repeated questions.                    |
+| **Rate limiting / budgets** | Per-tenant LLM token + cost caps                                                 | Stops one tenant from running up the OpenAI bill. Configurable by admin.                                      |
+| **Observability**           | OpenTelemetry spans for every LLM call                                           | Track tokens, latency, cost, success rate per surface.                                                        |
 
 ---
 
 ## Air-gapped story
 
-| Item | Detail |
-|---|---|
-| **Bundled local LLM** | Air-gapped install includes Ollama + Llama 3.1 8B or Qwen 2.5 7B. Larger models (70B) work if customer has GPU bandwidth. |
-| **Same code, different endpoint** | Ollama exposes OpenAI-compatible API. Air-gapped customers point at `localhost:11434`. No special integration. |
-| **Bundled embedding model** | nomic-embed-text or bge-base-en runs locally for semantic search and RAG. |
-| **Customer can BYO endpoint** | Azure OpenAI on customer's tenant, vLLM cluster, anything OpenAI-compatible — same env var. |
-| **Feature-flag AI off entirely** | Compliance teams that forbid LLM use → every AI surface degrades gracefully. Product still ships dashboards, queries, alerts, embeds. |
+| Item                              | Detail                                                                                                                                |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| **Bundled local LLM**             | Air-gapped install includes Ollama + Llama 3.1 8B or Qwen 2.5 7B. Larger models (70B) work if customer has GPU bandwidth.             |
+| **Same code, different endpoint** | Ollama exposes OpenAI-compatible API. Air-gapped customers point at `localhost:11434`. No special integration.                        |
+| **Bundled embedding model**       | nomic-embed-text or bge-base-en runs locally for semantic search and RAG.                                                             |
+| **Customer can BYO endpoint**     | Azure OpenAI on customer's tenant, vLLM cluster, anything OpenAI-compatible — same env var.                                           |
+| **Feature-flag AI off entirely**  | Compliance teams that forbid LLM use → every AI surface degrades gracefully. Product still ships dashboards, queries, alerts, embeds. |
 
 ---
 
 ## Cost model
 
-| Scenario | Who pays |
-|---|---|
-| **Cloud — bundled tokens** | Arc Insights bundles "AI tokens" into the SaaS price tier; charges for overages. |
-| **Cloud — BYO key** | Customer pastes their own OpenAI / Anthropic key. Their cost; nothing on Arc Insights' bill. |
-| **On-prem / air-gapped** | No LLM cost — customer runs Ollama. They pay only for the GPU node. |
+| Scenario                   | Who pays                                                                                     |
+| -------------------------- | -------------------------------------------------------------------------------------------- |
+| **Cloud — bundled tokens** | Arc Insights bundles "AI tokens" into the SaaS price tier; charges for overages.             |
+| **Cloud — BYO key**        | Customer pastes their own OpenAI / Anthropic key. Their cost; nothing on Arc Insights' bill. |
+| **On-prem / air-gapped**   | No LLM cost — customer runs Ollama. They pay only for the GPU node.                          |
 
 **Bounded by design:** Per-tenant token caps (soft warning at 80%, hard cap at 100%, admin can raise). Per-feature toggles. Aggressive caching cuts repeated calls 50%+. AI never silently blows up a customer's bill.
 

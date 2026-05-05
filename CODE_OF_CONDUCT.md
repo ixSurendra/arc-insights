@@ -7,6 +7,7 @@ We pledge to make participation in the Arc Insights community a harassment-free 
 ## Standards
 
 Behavior that contributes to a positive environment:
+
 - Using welcoming and inclusive language
 - Respecting differing viewpoints and experiences
 - Accepting constructive criticism
@@ -14,6 +15,7 @@ Behavior that contributes to a positive environment:
 - Showing empathy
 
 Unacceptable behavior:
+
 - Sexualized language or imagery, or unwelcome sexual attention
 - Trolling, insulting/derogatory comments, personal or political attacks
 - Public or private harassment

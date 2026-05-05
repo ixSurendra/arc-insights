@@ -8,14 +8,16 @@
  * before running any query. Postgres RLS policies read this variable to enforce
  * row-level isolation. See docs/adr/0003-multi-tenancy-model.md.
  */
-import { drizzle } from 'drizzle-orm/postgres-js';
-import { sql } from 'drizzle-orm';
-import postgres from 'postgres';
-import * as schema from './schema';
+import { drizzle } from "drizzle-orm/postgres-js";
+import { sql } from "drizzle-orm";
+import postgres from "postgres";
+import * as schema from "./schema";
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
-  throw new Error('DATABASE_URL is not set. Copy .env.example to .env and configure it.');
+  throw new Error(
+    "DATABASE_URL is not set. Copy .env.example to .env and configure it.",
+  );
 }
 
 // Single connection pool for the process. Max connections sized for the API tier.
@@ -45,7 +47,9 @@ export async function withTenant<T>(
     // Bind the tenant for the duration of this transaction. `set_config(..., true)`
     // is transaction-local (equivalent to SET LOCAL) and uses a real bind parameter,
     // so a hostile tenantId can't break out of the SQL.
-    await tx.execute(sql`SELECT set_config('app.tenant_id', ${tenantId}, true)`);
+    await tx.execute(
+      sql`SELECT set_config('app.tenant_id', ${tenantId}, true)`,
+    );
     return fn(tx);
   });
 }

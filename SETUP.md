@@ -73,6 +73,7 @@ make dev
 ```
 
 You should see:
+
 - Postgres + Valkey already running (from step 4)
 - Elysia API on `http://localhost:3000` (`/health` and `/docs`)
 - React frontend on `http://localhost:5173` proxying to the API

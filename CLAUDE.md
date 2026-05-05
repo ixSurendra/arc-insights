@@ -59,12 +59,12 @@ Read `docs/adr/0003-multi-tenancy-model.md` before touching any data layer. Summ
 
 ## Performance budgets (enforced in CI)
 
-| Metric | p50 | p99 |
-|---|---|---|
-| Cached query response | 150 ms | 500 ms |
-| Uncached query response | 1.5 s | 8 s |
-| Dashboard first paint | 800 ms | 2.0 s |
-| Embed iframe load | 400 ms | 1.5 s |
+| Metric                  | p50    | p99    |
+| ----------------------- | ------ | ------ |
+| Cached query response   | 150 ms | 500 ms |
+| Uncached query response | 1.5 s  | 8 s    |
+| Dashboard first paint   | 800 ms | 2.0 s  |
+| Embed iframe load       | 400 ms | 1.5 s  |
 
 ## Where to find more context
 

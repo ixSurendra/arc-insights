@@ -162,9 +162,9 @@ Each task has an ID like `P1-04`. Reference it in commits: `feat(connectors): ad
 
 ## How this file relates to PROGRESS.md
 
-| File | Purpose | How often it changes |
-|---|---|---|
+| File                     | Purpose                                         | How often it changes             |
+| ------------------------ | ----------------------------------------------- | -------------------------------- |
 | `ROADMAP.md` (this file) | Static plan: what we're building, in what order | Rarely — only when scope changes |
-| `PROGRESS.md` | Live status: what's done, in progress, blocked | Every commit |
+| `PROGRESS.md`            | Live status: what's done, in progress, blocked  | Every commit                     |
 
 If you find them out of sync, **PROGRESS.md is canonical.** Update ROADMAP.md only if the plan itself changes.

@@ -7,6 +7,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 ## [Unreleased]
 
 ### Added
+
 - Initial monorepo scaffold (Bun workspaces, Elysia backend, React + Vite frontend, Eden Treaty SDK).
 - Distroless multi-arch Dockerfile.
 - ADRs 0001 (stack), 0002 (license), 0003 (multi-tenancy).
@@ -23,21 +24,26 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 - Bun + DuckDB load-test spike script `backend/scripts/loadtest-duckdb.ts` and result log `docs/loadtest-results.md` (P0-21 — script ready, run pending).
 
 ### Changed
+
 - FEATURES.md: 143 → 147 features. Added dataset preview & profiling on connect (§1, P1), per-chart lineage & explainability panel (§4, P1), embed admin console (§9, P1), connector SDK (§16, P3).
 - ROADMAP.md: pulled scheduled subscriptions and PDF/PNG/CSV export forward from Phase 2 to Phase 1 (now P1-12, P1-13) so the §5 P0 priority is honored. Phase 2 renumbered (P2-03..P2-08) and shrank from 10 to 8 tasks; total 79 → 80.
 - ROADMAP.md: added embed admin console as P3-09; Phase 3 EXIT renumbered to P3-10. Phase 3 grew from 9 to 10 tasks.
 - PROGRESS.md: phase totals + task tables synced to the ROADMAP changes above.
 
 ### Deprecated
+
 - _Nothing yet._
 
 ### Removed
+
 - _Nothing yet._
 
 ### Fixed
+
 - _Nothing yet._
 
 ### Security
+
 - _Nothing yet._
 
 ---
@@ -47,4 +53,5 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 After every PR that adds, changes, deprecates, removes, or fixes something user-visible, append a one-line bullet under the appropriate section in `[Unreleased]`. When you cut a release, rename `[Unreleased]` to `[X.Y.Z] - YYYY-MM-DD` and start a fresh `[Unreleased]` block above it.
 
 Reference the task ID in each line where it applies — same convention as commits:
+
 - `- Added Snowflake connector with key-pair auth [P1-04].`

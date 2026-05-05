@@ -29,11 +29,11 @@ execution tier to a separate Go service before P3 ships.
 > Append a row each time you run the spike. Treat regressions across rows as
 > a signal worth investigating.
 
-| Date | Hardware | Bun | DuckDB | Concurrency | Queries | Rows | Wall (ms) | QPS | p50 | p95 | p99 | Verdict |
-|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| _TBD_ | _machine_ | 1.1.34 | _ver_ | 100 | 500 | 1,000,000 | _–_ | _–_ | _–_ | _–_ | _–_ | _pending_ |
+| Date  | Hardware  | Bun    | DuckDB | Concurrency | Queries |      Rows | Wall (ms) | QPS | p50 | p95 | p99 | Verdict   |
+| ----- | --------- | ------ | ------ | ----------: | ------: | --------: | --------: | --: | --: | --: | --: | --------- |
+| _TBD_ | _machine_ | 1.1.34 | _ver_  |         100 |     500 | 1,000,000 |       _–_ | _–_ | _–_ | _–_ | _–_ | _pending_ |
 
-## What this spike does *not* cover
+## What this spike does _not_ cover
 
 - Network round-trip to a real Postgres / Snowflake / BigQuery (the actual
   customer-DB tier). DuckDB is acting as the result-shaping layer here, not

@@ -5,8 +5,8 @@
  * Once imported in a client app, every backend route is fully typed —
  * rename a route field on the server and TypeScript breaks here at compile time.
  */
-import { treaty } from '@elysiajs/eden';
-import type { App } from '@arc-insights/backend/src/index';
+import { treaty } from "@elysiajs/eden";
+import type { App } from "@arc-insights/backend/src/index";
 
 export interface ArcInsightsClientOptions {
   /** Base URL of the Arc Insights API. Defaults to current origin. */
@@ -16,9 +16,11 @@ export interface ArcInsightsClientOptions {
 }
 
 export function createArcInsights(options: ArcInsightsClientOptions = {}) {
-  const baseUrl = options.baseUrl ?? '';
+  const baseUrl = options.baseUrl ?? "";
   return treaty<App>(baseUrl, {
-    headers: options.token ? { Authorization: `Bearer ${options.token}` } : undefined,
+    headers: options.token
+      ? { Authorization: `Bearer ${options.token}` }
+      : undefined,
   });
 }
 

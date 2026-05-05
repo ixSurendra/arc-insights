@@ -7,6 +7,7 @@
 ## Context
 
 Arc Insights serves three deployment shapes from one codebase:
+
 1. **Cloud SaaS** — many tenants on shared infrastructure
 2. **Embedded** — our customers' end-customers see only their own slice
 3. **On-prem / single-tenant** — one customer, one deployment

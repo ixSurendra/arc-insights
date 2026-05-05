@@ -38,27 +38,35 @@ A self-hostable, embeddable, multi-tenant BI platform. Customers connect their d
 ## Tiers
 
 ### API / Web tier
+
 Stateless. Bun process running Elysia. Handles HTTP requests, auth (Lucia + node-saml), authorization (Casbin + Postgres RLS), semantic-layer compilation, and orchestration. Serves the React SPA. Deploy as identical replicas behind the load balancer.
 
 ### Query worker tier
+
 Owns DuckDB. Talks to customer databases via native drivers (postgres.js, mysql2, snowflake-sdk, BigQuery client). Runs heavy queries off the API hot path. Heaviest workload — first to scale separately.
 
 ### Job worker tier
+
 graphile-worker (Postgres-backed). Scheduled subscriptions, alerts, exports, dbt-manifest imports. No new infrastructure.
 
 ### Real-time / collab tier (P2)
+
 Bun + y-websocket. CRDT-based co-editing for dashboards. WebSockets with sticky sessions on connection.
 
 ### Metadata layer
+
 PostgreSQL with Drizzle ORM. All workspace data (users, dashboards, queries, semantic models, audit logs). Highly available primary with read replicas at scale.
 
 ### Cache
+
 Valkey for cloud deploys. Bun's built-in SQLite for single-binary on-prem deploys. Same caching abstraction in code; differs only in adapter.
 
 ### Vector store
+
 pgvector inside the metadata Postgres. Stores embeddings of schemas, metric definitions, dashboard contents, docs.
 
 ### Object storage
+
 S3 / GCS for cloud. MinIO for on-prem. Used for dashboard exports (PDF, PNG, CSV), screenshot snapshots, license bundles.
 
 ## Request flow — what happens on chart click
@@ -98,13 +106,13 @@ Every AI surface (NL→SQL, why-did-X-change, dashboard summaries, anomaly notes
 
 ## Scaling stages
 
-| Stage | Customers | Topology |
-|---|---|---|
-| Monolith | 1–100 | One Bun process + one Postgres + one Valkey, vertical scale |
-| Horizontal stateless | 100–1,000 | ≥2 API replicas, managed Postgres + read replicas |
-| Service split | 1,000–10,000 | API / Query / Job / WebSocket as separate deployments |
-| Multi-region | 10,000+ | EU/US/APAC regions, edge JWT validation, in-region DB connections |
-| Platform | Enterprise + ecosystem | Plugin marketplace, on-prem fleet management |
+| Stage                | Customers              | Topology                                                          |
+| -------------------- | ---------------------- | ----------------------------------------------------------------- |
+| Monolith             | 1–100                  | One Bun process + one Postgres + one Valkey, vertical scale       |
+| Horizontal stateless | 100–1,000              | ≥2 API replicas, managed Postgres + read replicas                 |
+| Service split        | 1,000–10,000           | API / Query / Job / WebSocket as separate deployments             |
+| Multi-region         | 10,000+                | EU/US/APAC regions, edge JWT validation, in-region DB connections |
+| Platform             | Enterprise + ecosystem | Plugin marketplace, on-prem fleet management                      |
 
 ## Cloud / on-prem parity
 

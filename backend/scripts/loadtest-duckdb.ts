@@ -19,7 +19,7 @@
  * Result is printed to stdout and appended to docs/loadtest-results.md
  * if --append is passed.
  */
-import { Database } from 'duckdb-async';
+import { Database } from "duckdb-async";
 
 const CONCURRENCY = Number(process.env.CONCURRENCY ?? 100);
 const QUERIES_PER_WORKER = Number(process.env.QUERIES_PER_WORKER ?? 5);
@@ -33,7 +33,10 @@ interface Sample {
 
 function percentile(sorted: number[], p: number): number {
   if (sorted.length === 0) return 0;
-  const idx = Math.min(sorted.length - 1, Math.ceil((p / 100) * sorted.length) - 1);
+  const idx = Math.min(
+    sorted.length - 1,
+    Math.ceil((p / 100) * sorted.length) - 1,
+  );
   return sorted[idx]!;
 }
 
@@ -77,7 +80,7 @@ async function worker(db: Database, workerId: number): Promise<Sample[]> {
 }
 
 async function main(): Promise<void> {
-  const db = await Database.create(':memory:');
+  const db = await Database.create(":memory:");
   await seed(db);
 
   console.info(
@@ -90,7 +93,10 @@ async function main(): Promise<void> {
   );
   const wallMs = performance.now() - wallStart;
 
-  const all: number[] = results.flat().map((s) => s.durationMs).sort((a, b) => a - b);
+  const all: number[] = results
+    .flat()
+    .map((s) => s.durationMs)
+    .sort((a, b) => a - b);
   const total = all.length;
   const sum = all.reduce((a, b) => a + b, 0);
 
@@ -108,14 +114,16 @@ async function main(): Promise<void> {
     maxMs: Math.round(all[all.length - 1]!),
   };
 
-  console.info('\n── Results ───────────────────────────────────────');
+  console.info("\n── Results ───────────────────────────────────────");
   console.info(JSON.stringify(stats, null, 2));
 
   // Pass/fail against the cached-query budget in CLAUDE.md (p99 ≤ 500ms).
   // DuckDB on local synthetic data is uncached — uncached budget is p99 ≤ 8000ms.
   const PASS_P99_MS = Number(process.env.PASS_P99_MS ?? 8000);
   if (stats.p99Ms > PASS_P99_MS) {
-    console.error(`\n❌ FAIL — p99 ${stats.p99Ms}ms exceeds budget ${PASS_P99_MS}ms`);
+    console.error(
+      `\n❌ FAIL — p99 ${stats.p99Ms}ms exceeds budget ${PASS_P99_MS}ms`,
+    );
     process.exit(1);
   }
   console.info(`\n✅ PASS — p99 ${stats.p99Ms}ms ≤ ${PASS_P99_MS}ms`);

@@ -16,6 +16,7 @@ Connect your database, build dashboards, embed them anywhere — including on-pr
 Most BI tools force a trade-off: easy-to-use but closed-source (Looker, Tableau), open-source but operationally heavy (Superset), or modern but locked to one cloud (Sigma, Hex). Arc Insights is the alternative — modern, open-source, and built from day one to ship to other people's servers, including air-gapped ones.
 
 **Differentiators:**
+
 - 🪶 **Single-binary deployment** — Bun-compiled binary or distroless Docker image. No JVM, no Celery, no Redis required for small deploys.
 - 🔌 **Embed-first** — Eden Treaty SDK gives clients fully typed React, Vue, and vanilla components. iframe support for fast integration.
 - 🏠 **On-prem & air-gapped from day one** — Helm chart, BYOK / CMEK, license-key activation, and a tested air-gapped install bundle.
@@ -37,6 +38,7 @@ open http://localhost:5173
 ```
 
 That's it. The `make dev` script starts:
+
 - The Elysia API on `:3000`
 - The React frontend on `:5173` (proxied to the API)
 - Postgres on `:5432`
@@ -44,17 +46,17 @@ That's it. The `make dev` script starts:
 
 ## Stack at a glance
 
-| Layer | Pick |
-|---|---|
-| Backend | Elysia + Bun (TypeScript) |
-| Frontend | React + Vite + TypeScript |
-| Metadata DB | PostgreSQL (Drizzle ORM) |
-| Federated query | DuckDB embedded |
-| Cache | Valkey (cloud) / Bun SQLite (single-binary) |
-| Charts | Apache ECharts + AG Grid Community |
-| Auth | Lucia + node-saml (OIDC + SAML) |
-| LLM | BYO endpoint (OpenAI / Anthropic / Ollama) |
-| Deploy | Distroless Docker + Helm |
+| Layer           | Pick                                        |
+| --------------- | ------------------------------------------- |
+| Backend         | Elysia + Bun (TypeScript)                   |
+| Frontend        | React + Vite + TypeScript                   |
+| Metadata DB     | PostgreSQL (Drizzle ORM)                    |
+| Federated query | DuckDB embedded                             |
+| Cache           | Valkey (cloud) / Bun SQLite (single-binary) |
+| Charts          | Apache ECharts + AG Grid Community          |
+| Auth            | Lucia + node-saml (OIDC + SAML)             |
+| LLM             | BYO endpoint (OpenAI / Anthropic / Ollama)  |
+| Deploy          | Distroless Docker + Helm                    |
 
 Full stack rationale: see [`docs/adr/0001-stack-choice.md`](./docs/adr/0001-stack-choice.md).
 

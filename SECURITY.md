@@ -4,7 +4,7 @@
 
 | Version | Supported |
 | ------- | --------- |
-| 0.x     | ✅         |
+| 0.x     | ✅        |
 
 Pre-1.0 means we may ship breaking changes. Once 1.0 is reached, we'll publish a formal support window.
 
@@ -20,6 +20,7 @@ Email **security@arcinsights.io** with:
 - Your name (so we can credit you in the changelog, optional)
 
 We aim to:
+
 - Acknowledge your report within 48 hours.
 - Provide a remediation plan within 7 days.
 - Disclose publicly once a fix is available, with credit to you.
@@ -27,6 +28,7 @@ We aim to:
 ## Scope
 
 In scope:
+
 - Arc Insights backend (Elysia + Bun)
 - Arc Insights frontend (React)
 - Arc Insights SDK (`@arc-insights/sdk`)
@@ -34,6 +36,7 @@ In scope:
 - Documented APIs
 
 Out of scope:
+
 - Issues in third-party dependencies (report upstream first; let us know)
 - Social engineering or physical attacks
 - Denial of service (we have rate limits, not DoS protection)

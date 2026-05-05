@@ -7,6 +7,7 @@
 ## Context
 
 Arc Insights is open-source. The license affects:
+
 - Who can use, modify, redistribute, and self-host the product
 - Whether commercial cloud providers can offer Arc Insights as a managed service without contributing back
 - The defensibility of the founder's hosted SaaS business

@@ -6,9 +6,9 @@
  * Routes are versioned under /v1. Add new feature modules under src/features/
  * and mount them here.
  */
-import { Elysia, t } from 'elysia';
-import { cors } from '@elysiajs/cors';
-import { swagger } from '@elysiajs/swagger';
+import { Elysia, t } from "elysia";
+import { cors } from "@elysiajs/cors";
+import { swagger } from "@elysiajs/swagger";
 
 const PORT = Number(process.env.PORT ?? 3000);
 
@@ -16,27 +16,27 @@ const app = new Elysia()
   .use(cors())
   .use(
     swagger({
-      path: '/docs',
+      path: "/docs",
       documentation: {
         info: {
-          title: 'Arc Insights API',
-          version: '0.1.0',
-          description: 'Open-source BI and embedded analytics.',
+          title: "Arc Insights API",
+          version: "0.1.0",
+          description: "Open-source BI and embedded analytics.",
         },
       },
     }),
   )
   // ─── Health ─────────────────────────────────────────────────────
   .get(
-    '/health',
+    "/health",
     () => ({
-      status: 'ok',
-      service: 'arc-insights',
-      version: process.env.APP_VERSION ?? 'dev',
+      status: "ok",
+      service: "arc-insights",
+      version: process.env.APP_VERSION ?? "dev",
       timestamp: new Date().toISOString(),
     }),
     {
-      detail: { summary: 'Liveness check' },
+      detail: { summary: "Liveness check" },
       response: t.Object({
         status: t.String(),
         service: t.String(),
@@ -46,8 +46,8 @@ const app = new Elysia()
     },
   )
   // ─── v1 routes ──────────────────────────────────────────────────
-  .group('/v1', (app) =>
-    app.get('/hello', () => ({ message: 'Hello from Arc Insights v1' })),
+  .group("/v1", (app) =>
+    app.get("/hello", () => ({ message: "Hello from Arc Insights v1" })),
   )
   .listen(PORT);
 

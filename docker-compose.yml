@@ -6,11 +6,11 @@ services:
       POSTGRES_PASSWORD: arc_dev
       POSTGRES_DB: arc_insights
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U arc -d arc_insights']
+      test: ["CMD-SHELL", "pg_isready -U arc -d arc_insights"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -18,9 +18,9 @@ services:
   valkey:
     image: valkey/valkey:7-alpine
     ports:
-      - '6379:6379'
+      - "6379:6379"
     healthcheck:
-      test: ['CMD', 'valkey-cli', 'ping']
+      test: ["CMD", "valkey-cli", "ping"]
       interval: 5s
       timeout: 3s
       retries: 5
