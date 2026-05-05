@@ -1,0 +1,48 @@
+---
+title: "GET /health"
+description: "Liveness check for the Arc Insights API. Returns service identity and a server-side timestamp."
+api: "GET /health"
+---
+
+## Response
+
+<ResponseField name="status" type="string">
+  Always `"ok"` when the process is reachable.
+</ResponseField>
+
+<ResponseField name="service" type="string">
+  Service identifier — always `"arc-insights"`.
+</ResponseField>
+
+<ResponseField name="version" type="string">
+  Application version, taken from the `APP_VERSION` env var. Defaults to `"dev"`.
+</ResponseField>
+
+<ResponseField name="timestamp" type="string">
+  RFC 3339 UTC timestamp at the moment the response was generated.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl https://api.arcinsights.io/health
+```
+
+```typescript SDK
+import { createArcInsights } from "@arc-insights/sdk";
+
+const client = createArcInsights();
+const { data } = await client.health.get();
+console.log(data); // { status: "ok", service: "arc-insights", ... }
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200 OK
+{
+  "status": "ok",
+  "service": "arc-insights",
+  "version": "0.1.0",
+  "timestamp": "2026-05-06T01:23:45.678Z"
+}
+```
+</ResponseExample>

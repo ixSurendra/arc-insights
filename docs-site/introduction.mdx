@@ -1,0 +1,54 @@
+---
+title: "Welcome to Arc Insights"
+description: "Open-source BI and embedded analytics. Connect a database, build dashboards, embed them anywhere — including on-prem and air-gapped."
+---
+
+## Why Arc Insights
+
+Most BI tools force a trade-off: easy-to-use but closed-source (Looker, Tableau), open-source but operationally heavy (Superset), or modern but locked to one cloud (Sigma, Hex). **Arc Insights is the alternative** — modern, open-source, and built from day one to ship to other people's servers, including air-gapped ones.
+
+<CardGroup cols={2}>
+  <Card title="Single-binary deployment" icon="cube">
+    A Bun-compiled binary or distroless Docker image. No JVM, no Celery, no
+    Redis required for small deploys.
+  </Card>
+  <Card title="Embed-first SDKs" icon="code">
+    Eden Treaty SDK gives clients fully typed React, Vue, and vanilla
+    components. iframe support for fast integration.
+  </Card>
+  <Card title="On-prem & air-gapped" icon="lock">
+    Helm chart, BYOK / CMEK, license-key activation, and a tested air-gapped
+    install bundle.
+  </Card>
+  <Card title="Bring-your-own everything" icon="server">
+    Your LLM, your KMS, your Postgres, your warehouse. Defaults work for cloud
+    customers; locals work for everyone else.
+  </Card>
+</CardGroup>
+
+## Where to start
+
+<Steps>
+  <Step title="Install the dev loop">
+    `git clone` the repo, `bun install`, `make dev`. Five-minute setup; see the
+    [Quickstart](/quickstart).
+  </Step>
+  <Step title="Connect a database">
+    Postgres, MySQL, Snowflake, BigQuery — pick a connector and we'll scan the
+    schema for you. (Phase 1 work — drivers landing M1–M2.)
+  </Step>
+  <Step title="Build a dashboard">
+    Visual no-code builder or raw SQL. Apache ECharts and AG Grid render the
+    output. (Phase 1.)
+  </Step>
+  <Step title="Embed it">
+    Sign a JWT, drop in our React/Vue SDK, and you're live in your customer's
+    product. (Phase 3.)
+  </Step>
+</Steps>
+
+## Status
+
+This documentation site is a **Phase 0 stub** (`P0-18`). Real content lands as
+the product gets real — the [public Roadmap](https://github.com/ixSurendra/arc-insights/blob/main/docs/ROADMAP.md)
+tracks what's coming when.
