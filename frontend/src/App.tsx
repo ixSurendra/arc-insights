@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AppShell } from "./layout/AppShell";
 import { BuilderPage } from "./pages/Builder";
+import { DashboardPage } from "./pages/Dashboard";
 import { OverviewPage } from "./pages/Overview";
 
 export default function App() {
@@ -9,6 +10,7 @@ export default function App() {
       <AppShell>
         <Routes>
           <Route path="/" element={<OverviewPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/builder" element={<BuilderPage />} />
           <Route path="*" element={<OverviewPage />} />
         </Routes>

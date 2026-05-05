@@ -18,6 +18,7 @@ interface Item {
 
 const ITEMS: Item[] = [
   { icon: LayoutDashboard, label: "Overview", href: "/", end: true },
+  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
   { icon: BarChart3, label: "Builder", href: "/builder" },
   { icon: Database, label: "Data sources", href: "/data-sources" },
   { icon: Layers, label: "Models", href: "/models" },
