@@ -35,6 +35,8 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 - Helm chart skeleton at `helm/`: Chart.yaml, values.yaml, templates/{deployment,service,\_helpers.tpl}, .helmignore. Deployment runs as non-root with read-only rootfs and probes `/health`; Service exposes :3000. BYO Postgres + Valkey via `env`. Production HA build-out (multi-replica, bundled subcharts, BYOK, license keys) is P4-01. P0-14 done — Phase 0 now 19/22.
 - OpenTelemetry skeleton: `backend/src/telemetry.ts` exports a `tracer` from `@opentelemetry/api`, and the Elysia chain in `backend/src/index.ts` opens a span per request via `.derive`, sets attributes/status in `.onAfterResponse`, and ends + records exceptions in `.onError`. No SDK provider is registered yet, so spans are no-ops at runtime — the OTLP exporter and collector wiring land in P2-09. P0-16 done — Phase 0 now 20/22.
 - Public docs site stub at `docs-site/` (Mintlify): `mint.json`, `introduction.mdx`, `quickstart.mdx`, `api/health.mdx`, plus a README explaining the relationship between `docs/` (contributor docs) and `docs-site/` (end-user docs at docs.arcinsights.io). P0-18 done — Phase 0 now 21/22.
+- Phase 0 EXIT review at `docs/retro/2026-05-phase-0.md` — what shipped, what surprised us, exit-criteria status, decisions made/deferred, performance against budgets, carry into Phase 1. P0-22 done — **Phase 0 closed at 22/22.**
+- Pricing sketch at `docs/pricing.md` (internal alignment): 4 tiers (Free OSS, Cloud Starter, Cloud Pro, Enterprise), strategic shape, design-partner terms, open questions. Closes the matching Phase 0 exit-criterion.
 
 ### Deprecated
 

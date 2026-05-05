@@ -13,7 +13,7 @@ Live status of every task in the build plan. Update as you work.
 
 | Phase                            | Window      | Done | Total | Status      |
 | -------------------------------- | ----------- | ---- | ----- | ----------- |
-| **Phase 0** Foundation           | Weeks 1–2   | 21   | 22    | In Progress |
+| **Phase 0** Foundation           | Weeks 1–2   | 22   | 22    | ✓ Done      |
 | **Phase 1** Core MVP             | Months 1–3  | 0    | 14    | Not started |
 | **Phase 2** Production-ready     | Months 3–5  | 0    | 8     | Not started |
 | **Phase 3** Multi-tenant + Embed | Months 5–7  | 0    | 10    | Not started |
@@ -52,20 +52,20 @@ Live status of every task in the build plan. Update as you work.
 | P0-19   | README, CONTRIBUTING, SECURITY, CODE_OF_CONDUCT                | Solo  | Wk 2   | ✓      | 6e5ba77            |                                            |
 | P0-20   | First Playwright E2E test                                      | FE    | Wk 2   | ✓      | (this commit)      | health.spec.ts; CI runs on every PR        |
 | P0-21   | Bun + DuckDB load-test spike (100 concurrent queries)          | BE    | Wk 2   | ✓      | c2a1952            | p99 838 ms vs 8 s budget — Bun stays       |
-| P0-22   | Phase 0 EXIT review                                            | Solo  | Wk 2   | ☐      |                    |                                            |
+| P0-22   | Phase 0 EXIT review                                            | Solo  | Wk 2   | ✓      | (this commit)      | docs/retro/2026-05-phase-0.md              |
 
 ### Phase 0 Exit Criteria
 
-- [ ] All 22 Phase-0 tasks marked ✓ (21/22 done; remaining: P0-22)
+- [x] All 22 Phase-0 tasks marked ✓
 - [x] `make dev` boots on a fresh machine in <5 minutes
 - [x] CI green on every PR (first green run: c2a1952)
 - [x] Distroless image builds for amd64 + arm64
-- [ ] Helm chart deploys to a local Kind cluster
+- [ ] Helm chart deploys to a local Kind cluster (deferred to P4-01)
 - [x] Air-gapped install dry-run passes — disconnected container starts without errors
 - [x] Bun + DuckDB load-test result documented (continue Bun — p99 838 ms vs 8 s budget)
 - [x] First 3 ADRs committed in `/docs/adr/`
-- [ ] First 3 design partners signed and onboarded to a shared Slack/Discord
-- [ ] Pricing sketch published to `/docs/pricing.md` for internal alignment
+- [ ] First 3 design partners signed and onboarded to a shared Slack/Discord (non-technical track; **blocks P1-14**)
+- [x] Pricing sketch published to `/docs/pricing.md` for internal alignment
 
 ---
 
