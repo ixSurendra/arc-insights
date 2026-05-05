@@ -16,7 +16,15 @@ export interface ArcInsightsClientOptions {
 }
 
 export function createArcInsights(options: ArcInsightsClientOptions = {}) {
-  const baseUrl = options.baseUrl ?? "";
+  // Eden Treaty mangles an empty domain into "https:", which produces malformed
+  // URLs like "https:/health" in the browser. Default to the current origin so
+  // relative paths flow through the Vite dev proxy (and same-origin in prod).
+  // SSR / Node fall back to localhost:3000 so the SDK can be used in tests.
+  const baseUrl =
+    options.baseUrl ??
+    (typeof window !== "undefined"
+      ? window.location.origin
+      : "http://localhost:3000");
   return treaty<App>(baseUrl, {
     headers: options.token
       ? { Authorization: `Bearer ${options.token}` }
