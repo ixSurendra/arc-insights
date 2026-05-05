@@ -7,17 +7,18 @@ import {
   type LucideIcon,
   Users,
 } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 interface Item {
   icon: LucideIcon;
   label: string;
   href: string;
-  active?: boolean;
+  end?: boolean;
 }
 
 const ITEMS: Item[] = [
-  { icon: LayoutDashboard, label: "Dashboards", href: "/", active: true },
-  { icon: BarChart3, label: "Queries", href: "/queries" },
+  { icon: LayoutDashboard, label: "Overview", href: "/", end: true },
+  { icon: BarChart3, label: "Builder", href: "/builder" },
   { icon: Database, label: "Data sources", href: "/data-sources" },
   { icon: Layers, label: "Models", href: "/models" },
   { icon: Users, label: "Team", href: "/team" },
@@ -59,27 +60,27 @@ export function Sidebar() {
   );
 }
 
-function NavItem({ icon: Icon, label, href, active }: Item) {
+function NavItem({ icon: Icon, label, href, end }: Item) {
   return (
-    <a
-      href={href}
-      aria-current={active ? "page" : undefined}
-      style={{
+    <NavLink
+      to={href}
+      end={end}
+      style={({ isActive }) => ({
         display: "flex",
         alignItems: "center",
         gap: "var(--space-3)",
         padding: "var(--space-2) var(--space-3)",
         borderRadius: "var(--radius-md)",
-        color: active ? "var(--color-fg)" : "var(--color-fg-muted)",
-        background: active ? "var(--color-bg-hover)" : "transparent",
+        color: isActive ? "var(--color-fg)" : "var(--color-fg-muted)",
+        background: isActive ? "var(--color-bg-hover)" : "transparent",
         fontSize: "var(--text-sm)",
-        fontWeight: active ? 600 : 500,
+        fontWeight: isActive ? 600 : 500,
         textDecoration: "none",
         transition: "background var(--motion-fast) var(--ease)",
-      }}
+      })}
     >
       <Icon size={16} />
       {label}
-    </a>
+    </NavLink>
   );
 }
