@@ -74,21 +74,28 @@ ALTER TABLE users     FORCE  ROW LEVEL SECURITY;
 ALTER TABLE audit_log ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_log FORCE  ROW LEVEL SECURITY;
 
+-- DROP-then-CREATE so the bootstrap is idempotent — re-applying the migration
+-- locally during development doesn't fail on existing policies.
+
 -- The tenants table is itself tenant-scoped: a tenant can only see its own row.
+DROP POLICY IF EXISTS tenants_isolation ON tenants;
 CREATE POLICY tenants_isolation ON tenants
   USING (id::text = current_setting('app.tenant_id', true))
   WITH CHECK (id::text = current_setting('app.tenant_id', true));
 
+DROP POLICY IF EXISTS users_isolation ON users;
 CREATE POLICY users_isolation ON users
   USING (tenant_id::text = current_setting('app.tenant_id', true))
   WITH CHECK (tenant_id::text = current_setting('app.tenant_id', true));
 
 -- Audit log: SELECT and INSERT scoped by tenant. No UPDATE / DELETE policy
 -- exists, so they are blocked by RLS for everyone — append-only by construction.
+DROP POLICY IF EXISTS audit_log_select ON audit_log;
 CREATE POLICY audit_log_select ON audit_log
   FOR SELECT
   USING (tenant_id::text = current_setting('app.tenant_id', true));
 
+DROP POLICY IF EXISTS audit_log_insert ON audit_log;
 CREATE POLICY audit_log_insert ON audit_log
   FOR INSERT
   WITH CHECK (tenant_id::text = current_setting('app.tenant_id', true));
