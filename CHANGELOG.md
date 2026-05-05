@@ -29,6 +29,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 - ROADMAP.md: pulled scheduled subscriptions and PDF/PNG/CSV export forward from Phase 2 to Phase 1 (now P1-12, P1-13) so the §5 P0 priority is honored. Phase 2 renumbered (P2-03..P2-08) and shrank from 10 to 8 tasks; total 79 → 80.
 - ROADMAP.md: added embed admin console as P3-09; Phase 3 EXIT renumbered to P3-10. Phase 3 grew from 9 to 10 tasks.
 - PROGRESS.md: phase totals + task tables synced to the ROADMAP changes above.
+- PROGRESS.md: 16 Phase-0 tasks flipped to ✓ Done after CI went green on c2a1952. Phase 0 now 16/22; remaining: P0-02 (LICENSE), P0-14 (Helm), P0-16 (OTel), P0-18 (docs site), P0-20 (Playwright), P0-22 (EXIT review). 6 of 10 Phase-0 exit criteria now satisfied.
 
 ### Deprecated
 
