@@ -1,0 +1,50 @@
+# syntax=docker/dockerfile:1.7
+
+# ──────────────────────────────────────────────────────────────────
+# Arc Insights — production Dockerfile
+# Multi-stage: builder → distroless runtime.
+# Multi-arch: amd64 + arm64.
+# ──────────────────────────────────────────────────────────────────
+
+ARG BUN_VERSION=1.1.34
+
+# ─── Builder ──────────────────────────────────────────────────────
+FROM oven/bun:${BUN_VERSION}-alpine AS builder
+WORKDIR /app
+
+# Copy manifests first for better layer caching
+COPY package.json bun.lockb* ./
+COPY backend/package.json ./backend/
+COPY frontend/package.json ./frontend/
+COPY sdk/package.json ./sdk/
+
+RUN bun install --frozen-lockfile
+
+# Copy source
+COPY . .
+
+# Build frontend
+RUN bun run --filter '@arc-insights/frontend' build
+
+# Build backend
+RUN bun run --filter '@arc-insights/backend' build
+
+# ─── Runtime (distroless) ─────────────────────────────────────────
+FROM gcr.io/distroless/base-debian12:nonroot AS runtime
+WORKDIR /app
+
+# Bun runtime binary
+COPY --from=oven/bun:${BUN_VERSION}-distroless /usr/local/bin/bun /usr/local/bin/bun
+
+# Built artifacts
+COPY --from=builder /app/backend/dist ./backend/dist
+COPY --from=builder /app/frontend/dist ./frontend/dist
+COPY --from=builder /app/node_modules ./node_modules
+
+ENV NODE_ENV=production
+ENV PORT=3000
+EXPOSE 3000
+
+USER nonroot
+
+CMD ["/usr/local/bin/bun", "run", "backend/dist/index.js"]

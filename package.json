@@ -1,0 +1,50 @@
+{
+  "name": "arc-insights",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Open-source BI and embedded analytics. Connect, query, dashboard, embed.",
+  "homepage": "https://arcinsights.io",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ixSurendra/arc-insights.git"
+  },
+  "license": "AGPL-3.0",
+  "workspaces": [
+    "backend",
+    "frontend",
+    "sdk"
+  ],
+  "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "build": "bun run --filter '*' build",
+    "test": "bun run --filter '*' test",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "bun run --filter '*' typecheck",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@types/bun": "latest",
+    "eslint": "^9.0.0",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "globals": "^15.9.0",
+    "husky": "^9.1.0",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.2.0",
+    "typescript": "^5.5.0",
+    "typescript-eslint": "^8.0.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
+}

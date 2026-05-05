@@ -1,0 +1,10 @@
+[install]
+exact = false
+auto = "force"
+
+[install.scopes]
+# Add private registry scopes here if needed
+
+[test]
+preload = []
+coverage = false

@@ -1,0 +1,142 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  BUN_VERSION: 1.1.34
+
+jobs:
+  # ─── Static checks ─────────────────────────────────────────────────
+  lint-typecheck:
+    name: Lint + Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - run: bun install --frozen-lockfile
+      - run: bun run lint
+      - run: bun run typecheck
+      - run: bun run format:check
+
+  # ─── Unit + integration tests (with cross-tenant adversarial tests) ─
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: arc
+          POSTGRES_PASSWORD: arc_dev
+          POSTGRES_DB: arc_insights
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U arc -d arc_insights"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://arc:arc_dev@localhost:5432/arc_insights
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - run: bun install --frozen-lockfile
+      - name: Apply initial migration (schema + RLS)
+        run: |
+          sudo apt-get update && sudo apt-get install -y --no-install-recommends postgresql-client
+          psql "$DATABASE_URL" -f backend/drizzle/0000_initial.sql
+      - name: Run tests (includes cross-tenant adversarial suite)
+        run: bun run --filter '*' test
+
+  # ─── Frontend build ────────────────────────────────────────────────
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [lint-typecheck]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - run: bun install --frozen-lockfile
+      - run: bun run build
+
+  # ─── Docker image (single-arch on PR, multi-arch on main) ──────────
+  docker:
+    name: Docker
+    runs-on: ubuntu-latest
+    needs: [lint-typecheck, test, build]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - name: Build (PR — amd64 only, no push)
+        if: github.event_name == 'pull_request'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: false
+          tags: arc-insights:ci
+      - name: Build (main — multi-arch, no push yet)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: false
+          tags: arc-insights:ci
+
+  # ─── Air-gapped install dry-run ────────────────────────────────────
+  # Boots the built container with no network egress and verifies the
+  # process starts and the /health route responds. P0-15.
+  airgapped-dryrun:
+    name: Air-gapped install dry-run
+    runs-on: ubuntu-latest
+    needs: [docker]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build image locally
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: false
+          load: true
+          tags: arc-insights:airgap
+      - name: Boot with --network=none and probe /health
+        run: |
+          # Disconnected network — the container must start without reaching the internet.
+          docker run -d --rm --name arc-airgap --network=none -p 3000:3000 arc-insights:airgap
+          # Reattach a localhost-only bridge so we can probe.
+          docker network create arc-airgap-net
+          docker network connect arc-airgap-net arc-airgap
+          for i in $(seq 1 30); do
+            if docker exec arc-airgap wget -qO- http://localhost:3000/health | grep -q '"status":"ok"'; then
+              echo "✅ /health responded in air-gapped container"
+              docker stop arc-airgap
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "❌ /health did not respond"
+          docker logs arc-airgap || true
+          docker stop arc-airgap || true
+          exit 1
