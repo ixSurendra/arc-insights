@@ -13,7 +13,7 @@ Live status of every task in the build plan. Update as you work.
 
 | Phase                            | Window      | Done | Total | Status      |
 | -------------------------------- | ----------- | ---- | ----- | ----------- |
-| **Phase 0** Foundation           | Weeks 1–2   | 17   | 22    | In Progress |
+| **Phase 0** Foundation           | Weeks 1–2   | 18   | 22    | In Progress |
 | **Phase 1** Core MVP             | Months 1–3  | 0    | 14    | Not started |
 | **Phase 2** Production-ready     | Months 3–5  | 0    | 8     | Not started |
 | **Phase 3** Multi-tenant + Embed | Months 5–7  | 0    | 10    | Not started |
@@ -50,13 +50,13 @@ Live status of every task in the build plan. Update as you work.
 | P0-17   | ADR template + first 3 ADRs (stack, license, multi-tenancy)    | Solo  | Wk 2   | ✓      | 6e5ba77            |                                           |
 | P0-18   | Public docs site stub (Mintlify or Nextra)                     | FE    | Wk 2   | ☐      |                    |                                           |
 | P0-19   | README, CONTRIBUTING, SECURITY, CODE_OF_CONDUCT                | Solo  | Wk 2   | ✓      | 6e5ba77            |                                           |
-| P0-20   | First Playwright E2E test                                      | FE    | Wk 2   | ☐      |                    |                                           |
+| P0-20   | First Playwright E2E test                                      | FE    | Wk 2   | ✓      | (this commit)      | health.spec.ts; CI runs on every PR       |
 | P0-21   | Bun + DuckDB load-test spike (100 concurrent queries)          | BE    | Wk 2   | ✓      | c2a1952            | p99 838 ms vs 8 s budget — Bun stays      |
 | P0-22   | Phase 0 EXIT review                                            | Solo  | Wk 2   | ☐      |                    |                                           |
 
 ### Phase 0 Exit Criteria
 
-- [ ] All 22 Phase-0 tasks marked ✓ (17/22 done; remaining: P0-14, P0-16, P0-18, P0-20, P0-22)
+- [ ] All 22 Phase-0 tasks marked ✓ (18/22 done; remaining: P0-14, P0-16, P0-18, P0-22)
 - [x] `make dev` boots on a fresh machine in <5 minutes
 - [x] CI green on every PR (first green run: c2a1952)
 - [x] Distroless image builds for amd64 + arm64

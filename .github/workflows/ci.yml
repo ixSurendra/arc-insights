@@ -76,6 +76,31 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run build
 
+  # ─── End-to-end (Playwright) ───────────────────────────────────────
+  e2e:
+    name: E2E
+    runs-on: ubuntu-latest
+    needs: [lint-typecheck, build]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - run: bun install --frozen-lockfile
+      - name: Install Playwright browsers
+        working-directory: frontend
+        run: bunx playwright install --with-deps chromium
+      - name: Run Playwright tests
+        working-directory: frontend
+        run: bunx playwright test
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 7
+
   # ─── Docker image (single-arch on PR, multi-arch on main) ──────────
   docker:
     name: Docker
