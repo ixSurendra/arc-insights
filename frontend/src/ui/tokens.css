@@ -1,0 +1,178 @@
+/*
+ * Design tokens — single source of truth for color, space, type, radius,
+ * shadow, motion. Cascading themes (workspace → dashboard → chart) all
+ * override these properties at deeper scopes per UX-SPEC §3.
+ *
+ * `[data-theme='dark']` on <html> flips the palette. The non-color tokens
+ * (space, radius, etc.) stay constant across themes.
+ */
+
+:root {
+  /* ─── Color (light, default) ─────────────────────────────────────── */
+  --color-bg: #ffffff;
+  --color-bg-elev: #fafbfc;
+  --color-bg-subtle: #f1f4f7;
+  --color-bg-hover: #eef2f6;
+
+  --color-fg: #0f172a;
+  --color-fg-muted: #475569;
+  --color-fg-subtle: #94a3b8;
+
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+
+  --color-primary: #1f3a5f;
+  --color-primary-hover: #28456f;
+  --color-primary-fg: #ffffff;
+
+  --color-accent: #f4b860;
+  --color-accent-fg: #1f3a5f;
+
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+  --color-info: #2563eb;
+
+  --color-focus-ring: #1f3a5f;
+
+  /* ─── Space (4 px base) ──────────────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ─── Radius ─────────────────────────────────────────────────────── */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* ─── Shadow ─────────────────────────────────────────────────────── */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.12);
+
+  /* ─── Type ───────────────────────────────────────────────────────── */
+  --font-sans:
+    "Inter", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI",
+    sans-serif;
+  --font-mono: "JetBrains Mono", "Menlo", "Consolas", monospace;
+
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 16px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+  --text-3xl: 48px;
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+
+  /* ─── Motion ─────────────────────────────────────────────────────── */
+  --motion-fast: 120ms;
+  --motion-base: 180ms;
+  --motion-slow: 280ms;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ─── Layout ─────────────────────────────────────────────────────── */
+  --layout-topbar-h: 56px;
+  --layout-sidebar-w: 240px;
+  --layout-sidebar-w-collapsed: 56px;
+}
+
+[data-theme="dark"] {
+  --color-bg: #0b1120;
+  --color-bg-elev: #111827;
+  --color-bg-subtle: #1a2233;
+  --color-bg-hover: #1e293b;
+
+  --color-fg: #f1f5f9;
+  --color-fg-muted: #94a3b8;
+  --color-fg-subtle: #64748b;
+
+  --color-border: #1f2937;
+  --color-border-strong: #334155;
+
+  --color-primary: #f4b860;
+  --color-primary-hover: #f6c177;
+  --color-primary-fg: #1f3a5f;
+
+  --color-accent: #f4b860;
+  --color-accent-fg: #0b1120;
+
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #60a5fa;
+
+  --color-focus-ring: #f4b860;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Respect the system preference until the user picks one explicitly. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+  }
+}
+
+/* ─── Base reset + body styles ─────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--color-fg);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+code,
+pre {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+/* Visible focus ring only when navigating with the keyboard. */
+:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}

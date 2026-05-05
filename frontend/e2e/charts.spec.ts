@@ -10,9 +10,9 @@ import { test, expect } from "@playwright/test";
 test("chart demo: all six chart types render", async ({ page }) => {
   await page.goto("/");
 
-  // The cards container is below the health JSON, so wait for the demo
-  // heading to be sure App.tsx mounted with the new section.
-  await expect(page.getByRole("heading", { name: /Chart demo/ })).toBeVisible({
+  // Wait for the page header to confirm the shell mounted, then for the
+  // first chart card to appear.
+  await expect(page.getByRole("heading", { name: "Overview" })).toBeVisible({
     timeout: 10_000,
   });
 
