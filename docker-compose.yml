@@ -25,5 +25,26 @@ services:
       timeout: 3s
       retries: 5
 
+  # Used by the MySQL connector tests (P1-02). Same docker-compose so
+  # `make infra-up` brings up everything connector tests need.
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: arc_dev
+      MYSQL_DATABASE: arc_test
+      MYSQL_USER: arc
+      MYSQL_PASSWORD: arc_dev
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test:
+        ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-parc_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
 volumes:
   postgres_data:
+  mysql_data:

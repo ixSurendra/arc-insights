@@ -14,7 +14,7 @@ Live status of every task in the build plan. Update as you work.
 | Phase                            | Window      | Done | Total | Status      |
 | -------------------------------- | ----------- | ---- | ----- | ----------- |
 | **Phase 0** Foundation           | Weeks 1–2   | 22   | 22    | ✓ Done      |
-| **Phase 1** Core MVP             | Months 1–3  | 1    | 14    | In Progress |
+| **Phase 1** Core MVP             | Months 1–3  | 2    | 14    | In Progress |
 | **Phase 2** Production-ready     | Months 3–5  | 0    | 8     | Not started |
 | **Phase 3** Multi-tenant + Embed | Months 5–7  | 0    | 10    | Not started |
 | **Phase 4** On-prem + Air-gapped | Months 7–9  | 0    | 9     | Not started |
@@ -76,7 +76,7 @@ Live status of every task in the build plan. Update as you work.
 | Task ID | Task                                                               | Owner | Sprint | Status |
 | ------- | ------------------------------------------------------------------ | ----- | ------ | ------ |
 | P1-01   | Postgres connector (drivers, pool, schema scan)                    | BE    | M1     | ✓      |
-| P1-02   | MySQL/MariaDB connector                                            | BE    | M1     | ☐      |
+| P1-02   | MySQL/MariaDB connector                                            | BE    | M1     | ✓      |
 | P1-03   | BigQuery connector                                                 | BE    | M2     | ☐      |
 | P1-04   | Snowflake connector                                                | BE    | M2     | ☐      |
 | P1-05   | Visual no-code query builder (UI + JSON spec)                      | FE    | M1-M2  | ☐      |

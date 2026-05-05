@@ -15,7 +15,8 @@ api: "GET /health"
 </ResponseField>
 
 <ResponseField name="version" type="string">
-  Application version, taken from the `APP_VERSION` env var. Defaults to `"dev"`.
+  Application version, taken from the `APP_VERSION` env var. Defaults to
+  `"dev"`.
 </ResponseField>
 
 <ResponseField name="timestamp" type="string">
@@ -34,6 +35,7 @@ const client = createArcInsights();
 const { data } = await client.health.get();
 console.log(data); // { status: "ok", service: "arc-insights", ... }
 ```
+
 </RequestExample>
 
 <ResponseExample>
