@@ -9,6 +9,8 @@
 import { Elysia, t } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { swagger } from "@elysiajs/swagger";
+import { SpanStatusCode, type Span } from "@opentelemetry/api";
+import { tracer } from "./telemetry";
 
 const PORT = Number(process.env.PORT ?? 3000);
 
@@ -26,6 +28,39 @@ const _app = new Elysia()
       },
     }),
   )
+  // ─── Telemetry (P0-16): one span per request ─────────────────────
+  // No SDK provider is registered in Phase 0, so these spans are no-ops
+  // at runtime. P2-09 wires the OTLP exporter and they begin flowing.
+  .derive(({ request }): { span: Span } => {
+    const url = new URL(request.url);
+    return {
+      span: tracer.startSpan(`${request.method} ${url.pathname}`, {
+        attributes: {
+          "http.method": request.method,
+          "http.target": url.pathname,
+          "http.url": request.url,
+        },
+      }),
+    };
+  })
+  .onAfterResponse(({ span, set }) => {
+    const status = typeof set.status === "number" ? set.status : 200;
+    span.setAttribute("http.status_code", status);
+    span.setStatus({
+      code: status >= 400 ? SpanStatusCode.ERROR : SpanStatusCode.OK,
+    });
+    span.end();
+  })
+  .onError(({ span, error }) => {
+    if (span) {
+      span.recordException(error as Error);
+      span.setStatus({
+        code: SpanStatusCode.ERROR,
+        message: (error as Error).message,
+      });
+      span.end();
+    }
+  })
   // ─── Health ─────────────────────────────────────────────────────
   .get(
     "/health",
