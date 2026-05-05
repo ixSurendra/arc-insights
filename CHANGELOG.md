@@ -37,6 +37,7 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 - Public docs site stub at `docs-site/` (Mintlify): `mint.json`, `introduction.mdx`, `quickstart.mdx`, `api/health.mdx`, plus a README explaining the relationship between `docs/` (contributor docs) and `docs-site/` (end-user docs at docs.arcinsights.io). P0-18 done — Phase 0 now 21/22.
 - Phase 0 EXIT review at `docs/retro/2026-05-phase-0.md` — what shipped, what surprised us, exit-criteria status, decisions made/deferred, performance against budgets, carry into Phase 1. P0-22 done — **Phase 0 closed at 22/22.**
 - Pricing sketch at `docs/pricing.md` (internal alignment): 4 tiers (Free OSS, Cloud Starter, Cloud Pro, Enterprise), strategic shape, design-partner terms, open questions. Closes the matching Phase 0 exit-criterion.
+- **Phase 1 begins.** P1-01 — Postgres connector at `backend/src/connectors/`. `types.ts` defines the shared `Connector` interface (test, scanSchema, runQuery, close) with `SchemaTable`/`SchemaColumn`/`QueryResult` types that all four connectors will implement. `postgres.ts` wraps postgres.js as a single-pool-per-data-source driver: `test()` does `SELECT version()`, `scanSchema()` introspects via `information_schema.columns` joined with `information_schema.tables` (excludes pg_catalog/pg_toast/information_schema), `runQuery()` returns shaped rows with timing. 5 unit tests against the local docker-compose Postgres pass green.
 
 ### Deprecated
 
