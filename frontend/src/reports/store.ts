@@ -5,6 +5,7 @@
  * exercisable end-to-end.
  */
 import { create } from "zustand";
+import { persist, persistSlice } from "../lib/persist";
 import type { Report, ReportBlock, Schedule } from "./types";
 
 interface State {
@@ -139,42 +140,51 @@ const SEED: Report[] = [
   },
 ];
 
-export const useReports = create<State>((set) => ({
-  reports: SEED,
-  upsertReport: (r) =>
-    set((s) => {
-      const exists = s.reports.some((x) => x.id === r.id);
-      return {
-        reports: exists
-          ? s.reports.map((x) => (x.id === r.id ? r : x))
-          : [r, ...s.reports],
-      };
+export const useReports = create<State>()(
+  persist(
+    (set) => ({
+      reports: SEED,
+      upsertReport: (r) =>
+        set((s) => {
+          const exists = s.reports.some((x) => x.id === r.id);
+          return {
+            reports: exists
+              ? s.reports.map((x) => (x.id === r.id ? r : x))
+              : [r, ...s.reports],
+          };
+        }),
+      removeReport: (id) =>
+        set((s) => ({ reports: s.reports.filter((r) => r.id !== id) })),
+      updateBlocks: (id, blocks) =>
+        set((s) => ({
+          reports: s.reports.map((r) =>
+            r.id === id
+              ? { ...r, blocks, updatedAt: new Date().toISOString() }
+              : r,
+          ),
+        })),
+      setSchedule: (id, schedule) =>
+        set((s) => ({
+          reports: s.reports.map((r) => (r.id === id ? { ...r, schedule } : r)),
+        })),
+      setShowAutoSummary: (id, on) =>
+        set((s) => ({
+          reports: s.reports.map((r) =>
+            r.id === id ? { ...r, showAutoSummary: on } : r,
+          ),
+        })),
+      bumpVersion: (id) =>
+        set((s) => ({
+          reports: s.reports.map((r) =>
+            r.id === id ? { ...r, version: r.version + 1 } : r,
+          ),
+        })),
     }),
-  removeReport: (id) =>
-    set((s) => ({ reports: s.reports.filter((r) => r.id !== id) })),
-  updateBlocks: (id, blocks) =>
-    set((s) => ({
-      reports: s.reports.map((r) =>
-        r.id === id ? { ...r, blocks, updatedAt: new Date().toISOString() } : r,
-      ),
-    })),
-  setSchedule: (id, schedule) =>
-    set((s) => ({
-      reports: s.reports.map((r) => (r.id === id ? { ...r, schedule } : r)),
-    })),
-  setShowAutoSummary: (id, on) =>
-    set((s) => ({
-      reports: s.reports.map((r) =>
-        r.id === id ? { ...r, showAutoSummary: on } : r,
-      ),
-    })),
-  bumpVersion: (id) =>
-    set((s) => ({
-      reports: s.reports.map((r) =>
-        r.id === id ? { ...r, version: r.version + 1 } : r,
-      ),
-    })),
-}));
+    persistSlice<State>("reports", {
+      partialize: (state) => ({ reports: state.reports }) as unknown as State,
+    }),
+  ),
+);
 
 /**
  * Available widgets the composer can drop into the document. Phase 1

@@ -8,6 +8,7 @@
  * against this store so the UX is exercisable end-to-end.
  */
 import { create } from "zustand";
+import { persist, persistSlice } from "../lib/persist";
 import type {
   AccessPolicy,
   DataModel,
@@ -192,114 +193,124 @@ const SEED: DataModel = {
   pendingReview: true,
 };
 
-export const useDataModel = create<State>((set) => ({
-  model: SEED,
-  setTableFriendlyName: (id, friendly) =>
-    set((s) => ({
-      model: {
-        ...s.model,
-        tables: s.model.tables.map((t) =>
-          t.id === id ? { ...t, friendlyName: friendly } : t,
-        ),
-      },
-    })),
-  setColumn: (tableId, column) =>
-    set((s) => ({
-      model: {
-        ...s.model,
-        tables: s.model.tables.map((t) =>
-          t.id === tableId
-            ? {
-                ...t,
-                columns: t.columns.map((c) =>
-                  c.name === column.name ? column : c,
-                ),
-              }
-            : t,
-        ),
-      },
-    })),
-  toggleColumnHidden: (tableId, columnName) =>
-    set((s) => ({
-      model: {
-        ...s.model,
-        tables: s.model.tables.map((t) =>
-          t.id === tableId
-            ? {
-                ...t,
-                columns: t.columns.map((c) =>
-                  c.name === columnName ? { ...c, hidden: !c.hidden } : c,
-                ),
-              }
-            : t,
-        ),
-      },
-    })),
-  upsertMetric: (m) =>
-    set((s) => {
-      const exists = s.model.metrics.some((x) => x.id === m.id);
-      return {
-        model: {
-          ...s.model,
-          metrics: exists
-            ? s.model.metrics.map((x) => (x.id === m.id ? m : x))
-            : [...s.model.metrics, m],
-        },
-      };
+export const useDataModel = create<State>()(
+  persist(
+    (set) => ({
+      model: SEED,
+      setTableFriendlyName: (id, friendly) =>
+        set((s) => ({
+          model: {
+            ...s.model,
+            tables: s.model.tables.map((t) =>
+              t.id === id ? { ...t, friendlyName: friendly } : t,
+            ),
+          },
+        })),
+      setColumn: (tableId, column) =>
+        set((s) => ({
+          model: {
+            ...s.model,
+            tables: s.model.tables.map((t) =>
+              t.id === tableId
+                ? {
+                    ...t,
+                    columns: t.columns.map((c) =>
+                      c.name === column.name ? column : c,
+                    ),
+                  }
+                : t,
+            ),
+          },
+        })),
+      toggleColumnHidden: (tableId, columnName) =>
+        set((s) => ({
+          model: {
+            ...s.model,
+            tables: s.model.tables.map((t) =>
+              t.id === tableId
+                ? {
+                    ...t,
+                    columns: t.columns.map((c) =>
+                      c.name === columnName ? { ...c, hidden: !c.hidden } : c,
+                    ),
+                  }
+                : t,
+            ),
+          },
+        })),
+      upsertMetric: (m) =>
+        set((s) => {
+          const exists = s.model.metrics.some((x) => x.id === m.id);
+          return {
+            model: {
+              ...s.model,
+              metrics: exists
+                ? s.model.metrics.map((x) => (x.id === m.id ? m : x))
+                : [...s.model.metrics, m],
+            },
+          };
+        }),
+      removeMetric: (id) =>
+        set((s) => ({
+          model: {
+            ...s.model,
+            metrics: s.model.metrics.filter((m) => m.id !== id),
+          },
+        })),
+      upsertPolicy: (p) =>
+        set((s) => {
+          const exists = s.model.policies.some((x) => x.id === p.id);
+          return {
+            model: {
+              ...s.model,
+              policies: exists
+                ? s.model.policies.map((x) => (x.id === p.id ? p : x))
+                : [...s.model.policies, p],
+            },
+          };
+        }),
+      removePolicy: (id) =>
+        set((s) => ({
+          model: {
+            ...s.model,
+            policies: s.model.policies.filter((p) => p.id !== id),
+          },
+        })),
+      togglePolicyEnabled: (id) =>
+        set((s) => ({
+          model: {
+            ...s.model,
+            policies: s.model.policies.map((p) =>
+              p.id === id ? { ...p, enabled: !p.enabled } : p,
+            ),
+          },
+        })),
+      upsertJoin: (j) =>
+        set((s) => {
+          const exists = s.model.joins.some((x) => x.id === j.id);
+          return {
+            model: {
+              ...s.model,
+              joins: exists
+                ? s.model.joins.map((x) => (x.id === j.id ? j : x))
+                : [...s.model.joins, j],
+            },
+          };
+        }),
+      removeJoin: (id) =>
+        set((s) => ({
+          model: {
+            ...s.model,
+            joins: s.model.joins.filter((j) => j.id !== id),
+          },
+        })),
+      confirmReview: () =>
+        set((s) => ({ model: { ...s.model, pendingReview: false } })),
+      setJwtClaims: (claims) =>
+        set((s) => ({ model: { ...s.model, jwtClaims: claims } })),
     }),
-  removeMetric: (id) =>
-    set((s) => ({
-      model: {
-        ...s.model,
-        metrics: s.model.metrics.filter((m) => m.id !== id),
-      },
-    })),
-  upsertPolicy: (p) =>
-    set((s) => {
-      const exists = s.model.policies.some((x) => x.id === p.id);
-      return {
-        model: {
-          ...s.model,
-          policies: exists
-            ? s.model.policies.map((x) => (x.id === p.id ? p : x))
-            : [...s.model.policies, p],
-        },
-      };
+    persistSlice<State>("data-model", {
+      partialize: (state) => ({ model: state.model }) as unknown as State,
     }),
-  removePolicy: (id) =>
-    set((s) => ({
-      model: {
-        ...s.model,
-        policies: s.model.policies.filter((p) => p.id !== id),
-      },
-    })),
-  togglePolicyEnabled: (id) =>
-    set((s) => ({
-      model: {
-        ...s.model,
-        policies: s.model.policies.map((p) =>
-          p.id === id ? { ...p, enabled: !p.enabled } : p,
-        ),
-      },
-    })),
-  upsertJoin: (j) =>
-    set((s) => {
-      const exists = s.model.joins.some((x) => x.id === j.id);
-      return {
-        model: {
-          ...s.model,
-          joins: exists
-            ? s.model.joins.map((x) => (x.id === j.id ? j : x))
-            : [...s.model.joins, j],
-        },
-      };
-    }),
-  removeJoin: (id) =>
-    set((s) => ({
-      model: { ...s.model, joins: s.model.joins.filter((j) => j.id !== id) },
-    })),
-  confirmReview: () =>
-    set((s) => ({ model: { ...s.model, pendingReview: false } })),
-  setJwtClaims: (claims) =>
-    set((s) => ({ model: { ...s.model, jwtClaims: claims } })),
-}));
+  ),
+);

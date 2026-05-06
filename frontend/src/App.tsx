@@ -9,6 +9,7 @@ import { DataSourcesPage } from "./pages/DataSources";
 import { OverviewPage } from "./pages/Overview";
 import { ReportEditorPage } from "./pages/ReportEditor";
 import { ReportsPage } from "./pages/Reports";
+import { SettingsPage } from "./pages/Settings";
 import { SqlEditorPage } from "./pages/SqlEditor";
 import { WidgetsPage } from "./pages/Widgets";
 
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/data-sources/new" element={<ConnectDataPage />} />
           <Route path="/builder" element={<BuilderPage />} />
           <Route path="/sql" element={<SqlEditorPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<OverviewPage />} />
         </Routes>
       </AppShell>

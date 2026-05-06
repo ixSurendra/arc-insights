@@ -6,6 +6,7 @@
  * generated dashboard shows up everywhere a tenant looks.
  */
 import { create } from "zustand";
+import { persist, persistSlice } from "../lib/persist";
 import type { DashboardRecord } from "./types";
 
 interface State {
@@ -146,20 +147,30 @@ const SEED: DashboardRecord[] = [
   },
 ];
 
-export const useDashboards = create<State>((set, get) => ({
-  dashboards: SEED,
-  upsert: (d) =>
-    set((s) => {
-      const exists = s.dashboards.some((x) => x.id === d.id);
-      return {
-        dashboards: exists
-          ? s.dashboards.map((x) => (x.id === d.id ? d : x))
-          : [d, ...s.dashboards],
-      };
+export const useDashboards = create<State>()(
+  persist(
+    (set, get) => ({
+      dashboards: SEED,
+      upsert: (d) =>
+        set((s) => {
+          const exists = s.dashboards.some((x) => x.id === d.id);
+          return {
+            dashboards: exists
+              ? s.dashboards.map((x) => (x.id === d.id ? d : x))
+              : [d, ...s.dashboards],
+          };
+        }),
+      remove: (id) =>
+        set((s) => ({
+          dashboards: s.dashboards.filter((x) => x.id !== id),
+        })),
+      byId: (id) => get().dashboards.find((d) => d.id === id),
     }),
-  remove: (id) =>
-    set((s) => ({
-      dashboards: s.dashboards.filter((x) => x.id !== id),
-    })),
-  byId: (id) => get().dashboards.find((d) => d.id === id),
-}));
+    persistSlice<State>("dashboards", {
+      // Functions don't survive JSON.stringify; persisting only data
+      // keeps the storage payload small and the rehydration trivial.
+      partialize: (state) =>
+        ({ dashboards: state.dashboards }) as unknown as State,
+    }),
+  ),
+);
