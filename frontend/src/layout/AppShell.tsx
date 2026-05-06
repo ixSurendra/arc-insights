@@ -32,7 +32,7 @@ export function AppShell({ children, rightRail }: Props) {
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
-        background: "var(--color-bg-subtle)",
+        background: "var(--color-bg)",
       }}
     >
       <TopBar onCommandClick={() => setPaletteOpen(true)} />
@@ -42,7 +42,6 @@ export function AppShell({ children, rightRail }: Props) {
           style={{
             flex: 1,
             minWidth: 0,
-            padding: "var(--space-5) var(--space-6)",
             overflowX: "hidden",
           }}
         >

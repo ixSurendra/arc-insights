@@ -31,7 +31,7 @@ export function SqlEditorPage() {
   };
 
   return (
-    <>
+    <div style={{ padding: "var(--space-5) var(--space-6)" }}>
       <PageHeader
         breadcrumb="Workspace · Acme · Queries"
         title="SQL editor"
@@ -89,6 +89,6 @@ export function SqlEditorPage() {
           </div>
         )}
       </Card>
-    </>
+    </div>
   );
 }

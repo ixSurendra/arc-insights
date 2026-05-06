@@ -25,9 +25,15 @@ const PINNED_DASHBOARDS = [
     title: "Sales overview",
     folder: "Finance",
     owner: "Aman M.",
+    ownerInitials: "AM",
     updated: "12s ago",
     href: "/dashboard",
     accent: "var(--color-primary)",
+    metricLabel: "Q2 to date",
+    metricValue: "$405k",
+    metricDelta: "+14.2%",
+    metricDir: "up" as const,
+    status: "live" as const,
     spark: [120, 135, 148, 162, 178, 195, 215, 240],
   },
   {
@@ -35,9 +41,15 @@ const PINNED_DASHBOARDS = [
     title: "Growth funnel · self-serve",
     folder: "Growth",
     owner: "Priya S.",
+    ownerInitials: "PS",
     updated: "4m ago",
     href: "/dashboard",
     accent: "var(--color-accent)",
+    metricLabel: "Activations",
+    metricValue: "2,148",
+    metricDelta: "+8.4%",
+    metricDir: "up" as const,
+    status: "live" as const,
     spark: [90, 88, 102, 110, 118, 130, 142, 158],
   },
   {
@@ -45,9 +57,15 @@ const PINNED_DASHBOARDS = [
     title: "Infra · p99 latency",
     folder: "Engineering",
     owner: "Ravi K.",
+    ownerInitials: "RK",
     updated: "1h ago",
     href: "/dashboard",
     accent: "var(--color-cell-chart)",
+    metricLabel: "p99 (5m)",
+    metricValue: "838ms",
+    metricDelta: "−4ms",
+    metricDir: "down" as const,
+    status: "stale" as const,
     spark: [820, 815, 838, 842, 836, 830, 822, 818],
   },
   {
@@ -55,9 +73,15 @@ const PINNED_DASHBOARDS = [
     title: "Tenant usage rollup",
     folder: "Embed",
     owner: "Aman M.",
+    ownerInitials: "AM",
     updated: "3h ago",
     href: "/dashboard",
     accent: "var(--color-success)",
+    metricLabel: "Capacity used",
+    metricValue: "84%",
+    metricDelta: "+6pp",
+    metricDir: "up" as const,
+    status: "live" as const,
     spark: [40, 55, 60, 75, 78, 82, 90, 96],
   },
 ];
@@ -415,6 +439,7 @@ function DashboardGrid() {
         <Link
           key={d.id}
           to={d.href}
+          className="arc-card-lift"
           style={{
             background: "var(--color-bg-elev)",
             border: "1px solid var(--color-border)",
@@ -425,72 +450,204 @@ function DashboardGrid() {
             gap: "var(--space-3)",
             color: "inherit",
             textDecoration: "none",
-            transition:
-              "border-color var(--motion-fast) var(--ease), transform var(--motion-fast) var(--ease)",
             position: "relative",
             overflow: "hidden",
           }}
         >
+          {/* Accent gradient strip — brighter on hover */}
           <div
             aria-hidden
+            className="arc-card-accent"
             style={{
               position: "absolute",
               top: 0,
               left: 0,
               right: 0,
               height: 2,
-              background: `linear-gradient(90deg, ${d.accent}, transparent)`,
+              background: `linear-gradient(90deg, ${d.accent}, transparent 70%)`,
             }}
           />
+          {/* Soft radial glow corner echoing accent */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              top: -40,
+              right: -40,
+              width: 160,
+              height: 160,
+              background: `radial-gradient(circle, ${d.accent}, transparent 65%)`,
+              opacity: 0.08,
+              pointerEvents: "none",
+            }}
+          />
+
+          {/* Top row: folder tag · status indicator */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
               gap: "var(--space-2)",
+              position: "relative",
             }}
           >
             <span
               style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
                 fontSize: 10,
                 fontWeight: 700,
                 letterSpacing: "0.08em",
                 textTransform: "uppercase",
                 color: d.accent,
+                padding: "2px 6px",
+                borderRadius: "var(--radius-sm)",
+                background: `${d.accent}1a`,
               }}
             >
               {d.folder}
             </span>
-            <Star size={12} fill={d.accent} stroke={d.accent} />
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+                fontSize: 10,
+                fontWeight: 600,
+                color:
+                  d.status === "live"
+                    ? "var(--color-success)"
+                    : "var(--color-warning)",
+              }}
+            >
+              <span
+                aria-hidden
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: "50%",
+                  background:
+                    d.status === "live"
+                      ? "var(--color-success)"
+                      : "var(--color-warning)",
+                  boxShadow:
+                    d.status === "live"
+                      ? "0 0 0 3px rgba(52, 211, 153, 0.18)"
+                      : "0 0 0 3px rgba(251, 191, 36, 0.18)",
+                }}
+              />
+              {d.status === "live" ? "Live" : "Stale"}
+            </span>
           </div>
+
+          {/* Title */}
           <div
             style={{
               fontSize: "var(--text-md)",
               fontWeight: 600,
               color: "var(--color-fg)",
               lineHeight: "var(--leading-tight)",
+              position: "relative",
             }}
           >
             {d.title}
           </div>
-          <div style={{ height: 60 }}>
+
+          {/* Metric row: label + value + delta */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-end",
+              justifyContent: "space-between",
+              gap: "var(--space-2)",
+              position: "relative",
+            }}
+          >
+            <div style={{ minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: 10,
+                  fontWeight: 600,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  color: "var(--color-fg-subtle)",
+                  marginBottom: 2,
+                }}
+              >
+                {d.metricLabel}
+              </div>
+              <div
+                style={{
+                  fontSize: "var(--text-xl)",
+                  fontWeight: 700,
+                  letterSpacing: "-0.02em",
+                  color: "var(--color-fg)",
+                  lineHeight: 1,
+                  fontFamily: "var(--font-mono)",
+                }}
+              >
+                {d.metricValue}
+              </div>
+            </div>
+            <DeltaPill direction={d.metricDir} value={d.metricDelta} />
+          </div>
+
+          {/* Sparkline */}
+          <div
+            style={{ height: 72, marginInline: "calc(-1 * var(--space-2))" }}
+          >
             <Chart
               config={sparkConfig}
               data={{ rows: d.spark.map((v, i) => ({ i, v })) }}
-              height={60}
+              height={72}
             />
           </div>
+
+          {/* Footer: avatar + owner | updated */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              fontSize: 11,
-              color: "var(--color-fg-subtle)",
+              gap: "var(--space-2)",
+              paddingTop: "var(--space-2)",
+              borderTop: "1px solid var(--color-border)",
+              position: "relative",
             }}
           >
-            <span>{d.owner}</span>
-            <span>{d.updated}</span>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "var(--space-2)",
+                minWidth: 0,
+              }}
+            >
+              <Avatar initials={d.ownerInitials} />
+              <span
+                style={{
+                  fontSize: 11,
+                  color: "var(--color-fg-muted)",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {d.owner}
+              </span>
+            </div>
+            <span
+              style={{
+                fontSize: 11,
+                color: "var(--color-fg-subtle)",
+                fontFamily: "var(--font-mono)",
+                flexShrink: 0,
+              }}
+            >
+              {d.updated}
+            </span>
           </div>
         </Link>
       ))}

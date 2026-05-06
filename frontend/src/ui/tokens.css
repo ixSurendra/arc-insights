@@ -365,3 +365,26 @@ pre {
   position: relative;
   z-index: 1;
 }
+
+/* ─── Hover-lift card (pinned dashboards, etc.) ─────────────────── */
+.arc-card-lift {
+  transition:
+    transform var(--motion-base) var(--ease),
+    border-color var(--motion-base) var(--ease),
+    box-shadow var(--motion-base) var(--ease);
+  will-change: transform;
+}
+.arc-card-lift:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-border-strong);
+  box-shadow:
+    var(--shadow-md),
+    0 0 0 1px rgba(34, 211, 238, 0.15);
+}
+.arc-card-lift:hover .arc-card-accent {
+  opacity: 1;
+}
+.arc-card-accent {
+  opacity: 0.5;
+  transition: opacity var(--motion-base) var(--ease);
+}

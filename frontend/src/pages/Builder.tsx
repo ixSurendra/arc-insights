@@ -24,7 +24,7 @@ export function BuilderPage() {
   );
 
   return (
-    <>
+    <div style={{ padding: "var(--space-5) var(--space-6)" }}>
       <PageHeader
         breadcrumb="Workspace · Acme · Queries"
         title="New query"
@@ -54,6 +54,6 @@ export function BuilderPage() {
         />
         <BuilderPreview spec={spec} rows={sourceRows} />
       </div>
-    </>
+    </div>
   );
 }
