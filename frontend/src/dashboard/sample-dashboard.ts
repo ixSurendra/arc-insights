@@ -1,5 +1,45 @@
 import type { Dashboard } from "./types";
 
+export interface SampleChartMeta {
+  eyebrow: string;
+  cost: number;
+  refreshedSecondsAgo: number;
+  source: string;
+  cacheHit: boolean;
+}
+
+/** Per-chart presentational meta — not part of the persisted Dashboard model. */
+export const SAMPLE_META: Record<string, SampleChartMeta> = {
+  "revenue-by-month": {
+    eyebrow: "Time series · USD",
+    cost: 0.004,
+    refreshedSecondsAgo: 12,
+    source: "warehouse·prod",
+    cacheHit: true,
+  },
+  "total-revenue": {
+    eyebrow: "Q2 to date",
+    cost: 0.001,
+    refreshedSecondsAgo: 12,
+    source: "warehouse·prod",
+    cacheHit: true,
+  },
+  "revenue-by-region": {
+    eyebrow: "Bar · last 6 months",
+    cost: 0.003,
+    refreshedSecondsAgo: 12,
+    source: "warehouse·prod",
+    cacheHit: false,
+  },
+  "share-by-region": {
+    eyebrow: "Donut",
+    cost: 0.003,
+    refreshedSecondsAgo: 12,
+    source: "warehouse·prod",
+    cacheHit: true,
+  },
+};
+
 /**
  * Hand-built sample dashboard that demos every chart type the builder
  * can produce. Used until P1-10 persists user-saved dashboards.

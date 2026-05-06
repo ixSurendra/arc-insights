@@ -53,8 +53,18 @@ export function AppShell({ children, rightRail }: Props) {
 interface PageHeaderProps {
   title: ReactNode;
   description?: ReactNode;
+  /** Trailing actions row (right-aligned). */
   actions?: ReactNode;
+  /** Either a string ("Workspace · …") or structured Breadcrumbs. */
   breadcrumb?: ReactNode;
+  /** Icon rendered before the title (e.g. a starred dashboard). */
+  titleIcon?: ReactNode;
+  /** Pill rendered after the title (e.g. folder name "Finance"). */
+  tag?: ReactNode;
+  /** Status badge rendered after the tag (e.g. "Live · refreshed 12s ago"). */
+  status?: ReactNode;
+  /** Toolbar row above actions — for device toggle, refresh, etc. */
+  toolbar?: ReactNode;
 }
 
 export function PageHeader({
@@ -62,6 +72,10 @@ export function PageHeader({
   description,
   actions,
   breadcrumb,
+  titleIcon,
+  tag,
+  status,
+  toolbar,
 }: PageHeaderProps) {
   return (
     <header style={{ marginBottom: "var(--space-6)" }}>
@@ -84,17 +98,49 @@ export function PageHeader({
           gap: "var(--space-4)",
         }}
       >
-        <div>
-          <h1
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div
             style={{
-              fontSize: "var(--text-xl)",
-              fontWeight: 600,
-              margin: 0,
-              color: "var(--color-fg)",
+              display: "flex",
+              alignItems: "center",
+              gap: "var(--space-3)",
+              flexWrap: "wrap",
             }}
           >
-            {title}
-          </h1>
+            {titleIcon && (
+              <span
+                style={{ color: "var(--color-accent)", display: "inline-flex" }}
+              >
+                {titleIcon}
+              </span>
+            )}
+            <h1
+              style={{
+                fontSize: "var(--text-xl)",
+                fontWeight: 600,
+                margin: 0,
+                color: "var(--color-fg)",
+              }}
+            >
+              {title}
+            </h1>
+            {tag && (
+              <span
+                style={{
+                  fontSize: "var(--text-xs)",
+                  color: "var(--color-fg-muted)",
+                  fontWeight: 500,
+                  padding: "2px var(--space-2)",
+                  background: "var(--color-bg-subtle)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "var(--radius-sm)",
+                }}
+              >
+                {tag}
+              </span>
+            )}
+            {status}
+          </div>
           {description && (
             <p
               style={{
@@ -108,11 +154,31 @@ export function PageHeader({
             </p>
           )}
         </div>
-        {actions && (
-          <div style={{ display: "flex", gap: "var(--space-2)" }}>
-            {actions}
-          </div>
-        )}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "var(--space-3)",
+            flexShrink: 0,
+          }}
+        >
+          {toolbar && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "var(--space-2)",
+              }}
+            >
+              {toolbar}
+            </div>
+          )}
+          {actions && (
+            <div style={{ display: "flex", gap: "var(--space-2)" }}>
+              {actions}
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

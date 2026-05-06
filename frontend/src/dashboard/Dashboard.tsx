@@ -1,9 +1,10 @@
 import { useMemo } from "react";
 import { Chart } from "../charts/Chart";
+import { ChartCard } from "../charts/ChartCard";
 import { previewExecute } from "../builder/preview";
 import { SAMPLE_ROWS } from "../builder/sample-schema";
 import type { Filter } from "../builder/types";
-import { Card, CardHeader } from "../ui/Card";
+import { SAMPLE_META, type SampleChartMeta } from "./sample-dashboard";
 import type { Dashboard, DashboardChart } from "./types";
 
 interface Props {
@@ -17,7 +18,6 @@ export function DashboardView({ dashboard }: Props) {
       if (!map.has(c.grid.row)) map.set(c.grid.row, []);
       map.get(c.grid.row)!.push(c);
     }
-    // Sort each row by column.
     for (const row of map.values()) {
       row.sort((a, b) => a.grid.col - b.grid.col);
     }
@@ -46,6 +46,7 @@ export function DashboardView({ dashboard }: Props) {
               key={chart.id}
               chart={chart}
               globalFilters={dashboard.globalFilters}
+              meta={SAMPLE_META[chart.id]}
             />
           ))}
         </div>
@@ -57,12 +58,13 @@ export function DashboardView({ dashboard }: Props) {
 function DashboardChartCard({
   chart,
   globalFilters,
+  meta,
 }: {
   chart: DashboardChart;
   globalFilters: Filter[];
+  meta?: SampleChartMeta;
 }) {
   const data = useMemo(() => {
-    // Merge global filters into the chart's spec — global wins on conflict.
     const mergedSpec = {
       ...chart.spec,
       filters: [...chart.spec.filters, ...globalFilters],
@@ -72,16 +74,28 @@ function DashboardChartCard({
     return previewExecute(mergedSpec, rows);
   }, [chart, globalFilters]);
 
+  const metaLine = meta
+    ? [
+        `Refreshed ${meta.refreshedSecondsAgo}s ago`,
+        meta.source,
+        meta.cacheHit ? "cache hit" : "cache miss",
+      ].join(" · ")
+    : undefined;
+
   return (
-    <div
-      style={{
-        gridColumn: `span ${chart.grid.w}`,
-      }}
-    >
-      <Card testId={`dashboard-chart-${chart.id}`}>
-        <CardHeader title={chart.title} />
+    <div style={{ gridColumn: `span ${chart.grid.w}` }}>
+      <ChartCard
+        testId={`dashboard-chart-${chart.id}`}
+        eyebrow={meta?.eyebrow}
+        title={chart.title}
+        cost={meta?.cost}
+        meta={metaLine}
+        onMenu={() => {
+          /* placeholder for context menu — P1-10 */
+        }}
+      >
         <Chart config={chart.config} data={{ rows: data }} />
-      </Card>
+      </ChartCard>
     </div>
   );
 }
