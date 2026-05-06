@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
-import { Sidebar } from "./Sidebar";
+import { type ReactNode, useEffect, useState } from "react";
+import { ActivityRail } from "./ActivityRail";
+import { CommandPalette } from "./CommandPalette";
 import { TopBar } from "./TopBar";
 
 interface Props {
@@ -9,6 +10,22 @@ interface Props {
 }
 
 export function AppShell({ children, rightRail }: Props) {
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  // Global ⌘K / Ctrl+K listener. Open from anywhere; ignored when an input
+  // is focused unless the user explicitly hits the keystroke (cmdk handles
+  // the inner keyboard contract).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen((p) => !p);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
   return (
     <div
       style={{
@@ -18,14 +35,14 @@ export function AppShell({ children, rightRail }: Props) {
         background: "var(--color-bg-subtle)",
       }}
     >
-      <TopBar />
+      <TopBar onCommandClick={() => setPaletteOpen(true)} />
       <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
-        <Sidebar />
+        <ActivityRail />
         <main
           style={{
             flex: 1,
             minWidth: 0,
-            padding: "var(--space-6)",
+            padding: "var(--space-5) var(--space-6)",
             overflowX: "hidden",
           }}
         >
@@ -46,6 +63,10 @@ export function AppShell({ children, rightRail }: Props) {
           </aside>
         )}
       </div>
+      <CommandPalette
+        open={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+      />
     </div>
   );
 }

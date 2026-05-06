@@ -11,7 +11,12 @@ import { Logo } from "../ui/Logo";
 import { UserAvatar } from "./UserAvatar";
 import { WorkspacePill } from "./WorkspacePill";
 
-export function TopBar() {
+interface Props {
+  /** Wired by AppShell to open the global Cmd+K palette. */
+  onCommandClick?: () => void;
+}
+
+export function TopBar({ onCommandClick }: Props = {}) {
   const [theme, setLocalTheme] = useState<Theme>(getInitialTheme);
 
   return (
@@ -32,11 +37,12 @@ export function TopBar() {
       <Logo variant="wordmark" size={22} />
       <WorkspacePill workspace="Acme" environment="Production" branch="main" />
 
-      {/* Global search / Cmd+K placeholder */}
+      {/* Global search / Cmd+K trigger */}
       <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
         <button
           type="button"
           aria-label="Search (⌘K)"
+          onClick={onCommandClick}
           style={{
             display: "flex",
             alignItems: "center",

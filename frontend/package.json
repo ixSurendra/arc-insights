@@ -26,6 +26,7 @@
     "ag-grid-react": "^32.0.0",
     "lucide-react": "^0.460.0",
     "@monaco-editor/react": "^4.6.0",
+    "cmdk": "^1.0.0",
     "@arc-insights/sdk": "workspace:*"
   },
   "devDependencies": {
