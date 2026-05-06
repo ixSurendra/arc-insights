@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AppShell } from "./layout/AppShell";
 import { BuilderPage } from "./pages/Builder";
+import { ConnectDataPage } from "./pages/ConnectData";
 import { DashboardPage } from "./pages/Dashboard";
 import { DashboardsPage } from "./pages/Dashboards";
 import { DataModelPage } from "./pages/DataModel";
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/data-model" element={<DataModelPage />} />
           <Route path="/data-sources" element={<DataSourcesPage />} />
+          <Route path="/data-sources/new" element={<ConnectDataPage />} />
           <Route path="/builder" element={<BuilderPage />} />
           <Route path="/sql" element={<SqlEditorPage />} />
           <Route path="*" element={<OverviewPage />} />

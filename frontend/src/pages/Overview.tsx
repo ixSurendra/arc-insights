@@ -328,12 +328,16 @@ function Welcome() {
           </p>
         </div>
         <div style={{ display: "flex", gap: "var(--space-2)" }}>
-          <SecondaryAction iconLeft={<Database size={14} />}>
-            Connect data
-          </SecondaryAction>
-          <PrimaryAction iconLeft={<Plus size={14} />}>
-            New widget
-          </PrimaryAction>
+          <Link to="/data-sources/new" style={{ textDecoration: "none" }}>
+            <SecondaryAction iconLeft={<Database size={14} />}>
+              Connect data
+            </SecondaryAction>
+          </Link>
+          <Link to="/widgets/new" style={{ textDecoration: "none" }}>
+            <PrimaryAction iconLeft={<Plus size={14} />}>
+              New widget
+            </PrimaryAction>
+          </Link>
         </div>
       </div>
     </header>
