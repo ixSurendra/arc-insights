@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Chart } from "../charts/Chart";
 import { ChartCard } from "../charts/ChartCard";
+import { RichBigNumber } from "../charts/RichBigNumber";
 import { previewExecute } from "../builder/preview";
 import { SAMPLE_ROWS } from "../builder/sample-schema";
 import type { Filter } from "../builder/types";
@@ -82,19 +83,41 @@ function DashboardChartCard({
       ].join(" · ")
     : undefined;
 
+  // The dashboard's headline big-number gets the rich variant — eyebrow,
+  // delta pill, sparkline, sub-stats. Other charts use the standard Chart
+  // dispatch via ChartCard.
+  const isRichBigNumber = chart.id === "total-revenue";
+
   return (
     <div style={{ gridColumn: `span ${chart.grid.w}` }}>
       <ChartCard
         testId={`dashboard-chart-${chart.id}`}
-        eyebrow={meta?.eyebrow}
-        title={chart.title}
+        eyebrow={isRichBigNumber ? undefined : meta?.eyebrow}
+        title={isRichBigNumber ? "Total revenue" : chart.title}
         cost={meta?.cost}
         meta={metaLine}
         onMenu={() => {
           /* placeholder for context menu — P1-10 */
         }}
       >
-        <Chart config={chart.config} data={{ rows: data }} />
+        {isRichBigNumber ? (
+          <RichBigNumber
+            eyebrow={meta?.eyebrow}
+            label="Total revenue"
+            value="$405k"
+            delta="+14.2%"
+            deltaDirection="up"
+            deltaSuffix="vs prior period"
+            sparkline={[120, 135, 148, 162, 178, 195, 215, 240]}
+            subStats={[
+              { label: "Avg / month", value: "$67.5k" },
+              { label: "Best month", value: "$84.2k" },
+              { label: "Forecast Q3", value: "$1.42M" },
+            ]}
+          />
+        ) : (
+          <Chart config={chart.config} data={{ rows: data }} />
+        )}
       </ChartCard>
     </div>
   );
