@@ -1,12 +1,14 @@
 # Features
 
-The complete inventory of what Arc Insights does, organized by category. **147 features across 17 categories**, each tagged with priority (P0 launch blocker · P1 first 6 months · P2 strategic differentiator · P3 future).
+The complete inventory of what Arc Insights does, organized by category. **157 features across 17 categories**, each tagged with priority (P0 launch blocker · P1 first 6 months · P2 strategic differentiator · P3 future).
+
+> **Tasks vs features.** Not every feature has a ROADMAP task ID yet. Tasks are assigned when scope is sized; everything in P1 is fair game across Phase 1 and Phase 2.
 
 ★ marks the two strategic must-haves: **Embedded Analytics** and **On-Prem & Self-Hosted**.
 
 ---
 
-## 1. Data Connectivity (14)
+## 1. Data Connectivity (15)
 
 - [ ] Postgres connector — P0
 - [ ] MySQL/MariaDB connector — P0
@@ -19,16 +21,18 @@ The complete inventory of what Arc Insights does, organized by category. **147 f
 - [ ] SSH tunnels & private networking — P0
 - [ ] Schema auto-discovery on connect — P0
 - [ ] Dataset preview & profiling on connect (null counts, distincts, freshness, sample rows, suggested joins) — P1
+- [ ] Connection setup wizard (multi-step UI for adding a data source) — P1
 - [ ] Schema-drift detection — P2
 - [ ] Connection-level RBAC — P1
 - [ ] Read-replica routing — P2
 
-## 2. Query Building (13)
+## 2. Query Building (14)
 
 - [ ] Visual no-code query builder — P0
 - [ ] Raw SQL editor with autocomplete — P0
 - [ ] Query parameters / variables — P0
 - [ ] Saved queries with versioning — P1
+- [ ] Query history with runtime + cache + plan visibility — P1
 - [ ] Query results cache — P0
 - [ ] Query cost preview — P1
 - [ ] Async / background queries — P1
@@ -39,7 +43,7 @@ The complete inventory of what Arc Insights does, organized by category. **147 f
 - [ ] Attribution analysis — P3
 - [ ] Pivot table / spreadsheet cells — P2
 
-## 3. Semantic / Modeling Layer (7)
+## 3. Semantic / Modeling Layer (8)
 
 - [ ] Define metrics in code (YAML) — P1
 - [ ] Dimensions, joins, hierarchies — P1
@@ -48,6 +52,7 @@ The complete inventory of what Arc Insights does, organized by category. **147 f
 - [ ] Pre-aggregations / materializations — P2
 - [ ] Auto-suggest pre-aggs from usage — P2
 - [ ] Per-metric documentation & lineage — P1
+- [ ] Full lineage graph (chart → dataset → source → column) with impact analysis — P2
 
 ## 4. Visualizations (12)
 
@@ -64,7 +69,7 @@ The complete inventory of what Arc Insights does, organized by category. **147 f
 - [ ] Per-chart lineage & explainability panel (source DB → table → metric def → filter chain → runtime → cache hit) — P1
 - [ ] Custom viz plugin SDK — P3
 
-## 5. Dashboards & Reports (8)
+## 5. Dashboards & Reports (10)
 
 - [ ] Grid drag-and-drop layout — P0
 - [ ] Global + per-chart filters — P0
@@ -74,6 +79,8 @@ The complete inventory of what Arc Insights does, organized by category. **147 f
 - [ ] AI-suggested dashboards on connect — P2
 - [ ] Subscriptions (email / Slack digest) — P0
 - [ ] PDF / PNG / CSV export — P0
+- [ ] Overview hub (recently viewed, favorites, alerts-needing-attention, cache health) — P1
+- [ ] Scheduled export history & re-run — P1
 
 ## 6. Collaboration & Versioning (7)
 
@@ -85,7 +92,7 @@ The complete inventory of what Arc Insights does, organized by category. **147 f
 - [ ] Branches / drafts with PR review — P2
 - [ ] Activity feed — P1
 
-## 7. AI / Natural Language (7)
+## 7. AI / Natural Language (8)
 
 - [ ] NL Q&A grounded in semantic layer — P2
 - [ ] AI-generated chart from a question — P2
@@ -94,6 +101,7 @@ The complete inventory of what Arc Insights does, organized by category. **147 f
 - [ ] AI SQL pair-programmer — P1
 - [ ] Anomaly detection + push notify — P2
 - [ ] Monitoring + acting agent — P3
+- [ ] AI conversation history & threading — P2
 
 > All AI features go through one swappable endpoint. See [docs/AI-SURFACES.md](#) for the full map.
 
@@ -135,7 +143,7 @@ The complete inventory of what Arc Insights does, organized by category. **147 f
 - [ ] Result + query plan caching — P0
 - [ ] Materialization recommendations — P2
 
-## 11. Closed-Loop Actions (6)
+## 11. Closed-Loop Actions (7)
 
 - [ ] Threshold + anomaly alerts — P0
 - [ ] Action triggers (Slack / Linear / Jira / PagerDuty) — P2
@@ -143,6 +151,7 @@ The complete inventory of what Arc Insights does, organized by category. **147 f
 - [ ] Write-back to warehouse — P3
 - [ ] Reverse-ETL syncs (Salesforce / Braze / Hubspot) — P3
 - [ ] Action buttons on dashboards — P3
+- [ ] Alert history & incident timeline — P1
 
 ## 12. Security & Governance (10)
 
@@ -164,13 +173,15 @@ The complete inventory of what Arc Insights does, organized by category. **147 f
 - [ ] Mobile-first chart authoring — P3
 - [ ] Offline mode for cached dashboards — P3
 
-## 14. Admin / Ops (5)
+## 14. Admin / Ops (7)
 
 - [ ] Workspace / org management — P0
 - [ ] User management UI — P0
 - [ ] Usage analytics on the product itself — P1
 - [ ] Workspace backup & restore — P1
 - [ ] Multi-region deployment (cloud) — P3
+- [ ] Tenant admin UI (list, settings, themes, usage, support impersonation) — P1
+- [ ] Workspace settings admin UI (branding, LLM provider, KMS) — P1
 
 ## 15. On-Prem & Self-Hosted ★ (14) — STRATEGIC MUST-HAVE
 
@@ -189,7 +200,7 @@ The complete inventory of what Arc Insights does, organized by category. **147 f
 - [ ] Long-term support (LTS) release line — P2
 - [ ] FIPS / FedRAMP / IL4 compatibility — P3
 
-## 16. Developer Experience (6)
+## 16. Developer Experience (7)
 
 - [ ] REST + GraphQL API — P1
 - [ ] Python and TypeScript SDKs — P1
@@ -197,6 +208,7 @@ The complete inventory of what Arc Insights does, organized by category. **147 f
 - [ ] Webhook events — P2
 - [ ] Public docs + OpenAPI spec — P1
 - [ ] Connector SDK (community-authored data sources) — P3
+- [ ] API key management UI — P1
 
 ## 17. Internationalization (5)
 
@@ -211,8 +223,8 @@ The complete inventory of what Arc Insights does, organized by category. **147 f
 ## Counts by priority
 
 - **P0 (MVP launch blockers):** 38
-- **P1 (first 6 months):** 53
-- **P2 (strategic differentiators):** 43
+- **P1 (first 6 months):** 61
+- **P2 (strategic differentiators):** 45
 - **P3 (future / backlog):** 13
 
-**Total: 147 features**
+**Total: 157 features**

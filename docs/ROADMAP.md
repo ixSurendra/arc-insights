@@ -65,9 +65,10 @@ Each task has an ID like `P1-04`. Reference it in commits: `feat(connectors): ad
 - P1-11 — Email/password auth + basic RBAC
 - P1-12 — graphile-worker for scheduled subscriptions (email / Slack digest)
 - P1-13 — PDF / PNG / CSV export
-- P1-14 — Phase 1 EXIT review with first design partner
+- P1-14 — Public tokenized share links + public (no-login) dashboards
+- P1-15 — Phase 1 EXIT review with first design partner
 
-**Exit:** Internal user connects to Postgres, builds a dashboard with 4 charts, p95 query <2s. Scheduled subscription delivers a PDF digest by email.
+**Exit:** Internal user connects to Postgres, builds a dashboard with 4 charts, p95 query <2s. Scheduled subscription delivers a PDF digest by email. Tokenized share link works for an external viewer.
 
 ---
 
@@ -128,11 +129,10 @@ Each task has an ID like `P1-04`. Reference it in commits: `feat(connectors): ad
 - P5-03 — Funnel builder
 - P5-04 — Retention / heatmap builder
 - P5-05 — Slack interactive cards (Block Kit)
-- P5-06 — Public tokenized share links
-- P5-07 — AI NL Q&A grounded in semantic layer (BYO LLM)
-- P5-08 — Schema-drift detection + auto-mapping suggestions
-- P5-09 — Synthetic / demo mode
-- P5-10 — Phase 5 EXIT — ≥3 features no other BI tool ships, public case study
+- P5-06 — AI NL Q&A grounded in semantic layer (BYO LLM)
+- P5-07 — Schema-drift detection + auto-mapping suggestions
+- P5-08 — Synthetic / demo mode
+- P5-09 — Phase 5 EXIT — ≥3 features no other BI tool ships, public case study
 
 ---
 

@@ -14,14 +14,14 @@ Live status of every task in the build plan. Update as you work.
 | Phase                            | Window      | Done | Total | Status      |
 | -------------------------------- | ----------- | ---- | ----- | ----------- |
 | **Phase 0** Foundation           | Weeks 1–2   | 22   | 22    | ✓ Done      |
-| **Phase 1** Core MVP             | Months 1–3  | 7    | 14    | In Progress |
+| **Phase 1** Core MVP             | Months 1–3  | 7    | 15    | In Progress |
 | **Phase 2** Production-ready     | Months 3–5  | 0    | 8     | Not started |
 | **Phase 3** Multi-tenant + Embed | Months 5–7  | 0    | 10    | Not started |
 | **Phase 4** On-prem + Air-gapped | Months 7–9  | 0    | 9     | Not started |
-| **Phase 5** Differentiators      | Months 9–12 | 0    | 10    | Not started |
+| **Phase 5** Differentiators      | Months 9–12 | 0    | 9     | Not started |
 | **Phase 6** Scale + Ecosystem    | Year 2      | 0    | 7     | Not started |
 
-> Update the Done counts after each commit. The total is **80 tasks** across 7 phases.
+> Update the Done counts after each commit. The total is **80 tasks** across 7 phases. (Phase 1 grew by 1 with the public-share-links task pulled forward; Phase 5 shrank by 1 — net 0.)
 
 ---
 
@@ -64,7 +64,7 @@ Live status of every task in the build plan. Update as you work.
 - [x] Air-gapped install dry-run passes — disconnected container starts without errors
 - [x] Bun + DuckDB load-test result documented (continue Bun — p99 838 ms vs 8 s budget)
 - [x] First 3 ADRs committed in `/docs/adr/`
-- [ ] First 3 design partners signed and onboarded to a shared Slack/Discord (non-technical track; **blocks P1-14**)
+- [ ] First 3 design partners signed and onboarded to a shared Slack/Discord (non-technical track; **blocks P1-15**)
 - [x] Pricing sketch published to `/docs/pricing.md` for internal alignment
 
 ---
@@ -88,7 +88,8 @@ Live status of every task in the build plan. Update as you work.
 | P1-11   | Email/password auth + basic RBAC                                   | BE    | M3     | ☐      |
 | P1-12   | graphile-worker for scheduled subscriptions (email / Slack digest) | BE    | M3     | ☐      |
 | P1-13   | PDF / PNG / CSV export                                             | BE+FE | M3     | ☐      |
-| P1-14   | Phase 1 EXIT review with first design partner                      | Solo  | M3     | ☐      |
+| P1-14   | Public tokenized share links + public (no-login) dashboards        | BE+FE | M3     | ☐      |
+| P1-15   | Phase 1 EXIT review with first design partner                      | Solo  | M3     | ☐      |
 
 ### Phase 1 Exit Criteria
 
@@ -177,11 +178,10 @@ Live status of every task in the build plan. Update as you work.
 | P5-03   | Funnel builder                                    | FE+BE | M10     | ☐      |
 | P5-04   | Retention / heatmap builder                       | FE+BE | M11     | ☐      |
 | P5-05   | Slack interactive cards (Block Kit)               | BE    | M11     | ☐      |
-| P5-06   | Public tokenized share links                      | BE    | M11     | ☐      |
-| P5-07   | AI NL Q&A grounded in semantic layer (BYO LLM)    | BE+FE | M11-M12 | ☐      |
-| P5-08   | Schema-drift detection + auto-mapping             | BE    | M12     | ☐      |
-| P5-09   | Synthetic / demo mode                             | BE+FE | M12     | ☐      |
-| P5-10   | Phase 5 EXIT — ≥3 features no other BI tool ships | Solo  | M12     | ☐      |
+| P5-06   | AI NL Q&A grounded in semantic layer (BYO LLM)    | BE+FE | M11-M12 | ☐      |
+| P5-07   | Schema-drift detection + auto-mapping             | BE    | M12     | ☐      |
+| P5-08   | Synthetic / demo mode                             | BE+FE | M12     | ☐      |
+| P5-09   | Phase 5 EXIT — ≥3 features no other BI tool ships | Solo  | M12     | ☐      |
 
 ### Phase 5 Exit Criteria
 
