@@ -16,7 +16,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Chart } from "../charts/Chart";
 import type { ChartConfig } from "../charts/types";
 
@@ -1092,11 +1092,19 @@ function formatDate(d: Date): string {
 // ─── Ask AI input (persistent, top of home) ────────────────────────
 function AskAIInput() {
   const [value, setValue] = useState("");
+  const navigate = useNavigate();
   const exemplars = [
     "Revenue by region last 90 days",
     "Why did EU sales drop in Q3?",
     "Top 10 customers by lifetime value",
   ];
+
+  const submit = (q: string) => {
+    const text = q.trim();
+    if (!text) return;
+    navigate(`/widgets/new?door=ai&q=${encodeURIComponent(text)}`);
+  };
+
   return (
     <div
       style={{
@@ -1106,7 +1114,10 @@ function AskAIInput() {
     >
       <form
         role="search"
-        onSubmit={(e) => e.preventDefault()}
+        onSubmit={(e) => {
+          e.preventDefault();
+          submit(value);
+        }}
         style={{
           display: "flex",
           alignItems: "center",

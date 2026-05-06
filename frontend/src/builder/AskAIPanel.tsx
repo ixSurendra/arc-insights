@@ -6,12 +6,16 @@
  * chunk; this hooks the contract so the surface is in place.
  */
 import { Loader2, Send, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { aiEnabled, suggestWidgetSpec } from "../lib/ai";
 import type { QuerySpec, SchemaTable } from "./types";
 
 interface Props {
   table: SchemaTable;
   onApply: (spec: QuerySpec, naturalQuestion: string) => void;
+  /** Optional pre-filled prompt — used when the home Ask-AI input
+   *  navigates to /widgets/new?q=… so we can auto-submit. */
+  initialPrompt?: string;
 }
 
 const EXAMPLES = [
@@ -20,21 +24,57 @@ const EXAMPLES = [
   "Daily orders trend for Q2",
 ];
 
-export function AskAIPanel({ table, onApply }: Props) {
-  const [q, setQ] = useState("");
+export function AskAIPanel({ table, onApply, initialPrompt }: Props) {
+  const [q, setQ] = useState(initialPrompt ?? "");
   const [busy, setBusy] = useState(false);
   const [reasoning, setReasoning] = useState<string | null>(null);
 
-  const submit = (text: string) => {
+  const submit = async (text: string) => {
     if (!text.trim()) return;
     setQ(text);
     setBusy(true);
     setReasoning(`Looking at \`${table.schema}.${table.name}\`…`);
-    setTimeout(() => {
+
+    if (aiEnabled()) {
+      setReasoning(
+        `Asking the model to draft a widget for: "${text.slice(0, 80)}"`,
+      );
+      const spec = await suggestWidgetSpec(
+        { schema: table.schema, name: table.name },
+        table.columns.map((c) => ({ name: c.name, kind: c.inferredKind })),
+        text,
+      );
+      if (spec) {
+        const querySpec: QuerySpec = {
+          from: spec.from,
+          dimensions: spec.dimensions.map((d) => ({
+            column: d.column,
+            alias: d.alias,
+          })),
+          measures: spec.measures.map((m) => ({
+            column: m.column,
+            agg: m.agg,
+            alias: m.alias,
+          })),
+          filters: [],
+          orderBy: [],
+          limit: spec.limit ?? 1000,
+        };
+        onApply(querySpec, text);
+        setBusy(false);
+        setReasoning(null);
+        return;
+      }
+      // Fall through to deterministic mock if AI returned null.
+      setReasoning(
+        "AI didn't return a usable spec — falling back to a deterministic draft.",
+      );
+    } else {
       setReasoning(
         `Picking dimensions and a measure that match: "${text.slice(0, 80)}"`,
       );
-    }, 500);
+    }
+
     setTimeout(() => {
       const spec: QuerySpec = {
         from: { schema: table.schema, table: table.name },
@@ -49,6 +89,14 @@ export function AskAIPanel({ table, onApply }: Props) {
       setReasoning(null);
     }, 1100);
   };
+
+  // Auto-submit when an initialPrompt is supplied (home Ask AI handoff).
+  useEffect(() => {
+    if (initialPrompt && initialPrompt.trim()) {
+      void submit(initialPrompt);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <section

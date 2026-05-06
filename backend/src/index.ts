@@ -10,6 +10,7 @@ import { Elysia, t } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { swagger } from "@elysiajs/swagger";
 import { SpanStatusCode, type Span } from "@opentelemetry/api";
+import { aiRoutes } from "./ai/routes";
 import { tracer } from "./telemetry";
 
 const PORT = Number(process.env.PORT ?? 3000);
@@ -84,6 +85,7 @@ const _app = new Elysia()
   .group("/v1", (app) =>
     app.get("/hello", () => ({ message: "Hello from Arc Insights v1" })),
   )
+  .use(aiRoutes)
   .listen(PORT);
 
 console.info(`🚀 Arc Insights API listening on http://localhost:${PORT}`);

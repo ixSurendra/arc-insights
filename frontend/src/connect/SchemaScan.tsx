@@ -9,6 +9,7 @@
  */
 import { Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { aiEnabled, streamSchemaNarration } from "../lib/ai";
 import type { ColumnType } from "./csv";
 
 export interface ScannedTable {
@@ -27,15 +28,77 @@ interface Props {
 }
 
 export function SchemaScan({ tables, onComplete }: Props) {
-  const lines = buildNarration(tables);
+  const fallbackLines = buildNarration(tables);
+  const [streamedLines, setStreamedLines] = useState<string[] | null>(null);
+  const [streamingDone, setStreamingDone] = useState(false);
   const [visible, setVisible] = useState(0);
   const completedRef = useRef(false);
 
+  // Try real AI streaming when enabled; on any failure, fall back.
   useEffect(() => {
+    if (!aiEnabled()) return;
+    const ctrl = new AbortController();
+    let buffer = "";
+    let cancelled = false;
+    (async () => {
+      try {
+        const gen = streamSchemaNarration(
+          tables.map((t) => ({
+            name: t.name,
+            rowCount: t.rowCount,
+            columns: t.columns.map((c) => ({ name: c.name, type: c.type })),
+          })),
+          ctrl.signal,
+        );
+        const all: string[] = [];
+        for await (const chunk of gen) {
+          if (cancelled) return;
+          buffer += chunk;
+          // Split on newlines: each completed line becomes a new entry.
+          const parts = buffer.split("\n");
+          buffer = parts.pop() ?? "";
+          for (const p of parts) {
+            const trimmed = p.trim();
+            if (!trimmed) continue;
+            all.push(trimmed);
+            setStreamedLines([...all]);
+          }
+        }
+        if (cancelled) return;
+        if (buffer.trim()) {
+          all.push(buffer.trim());
+          setStreamedLines([...all]);
+        }
+        if (all.length > 0) {
+          setStreamingDone(true);
+        }
+      } catch {
+        /* fall back below */
+      }
+    })();
+    return () => {
+      cancelled = true;
+      ctrl.abort();
+    };
+  }, [tables]);
+
+  // If we got AI lines, drive the reveal off them. Otherwise the
+  // deterministic timer below paces the fallback narration.
+  const usingAI = streamedLines !== null;
+  const lines = usingAI ? streamedLines! : fallbackLines;
+
+  useEffect(() => {
+    if (usingAI) {
+      if (streamingDone && !completedRef.current) {
+        completedRef.current = true;
+        const t = setTimeout(() => onComplete?.(), 800);
+        return () => clearTimeout(t);
+      }
+      return;
+    }
     if (visible >= lines.length) {
       if (!completedRef.current) {
         completedRef.current = true;
-        // Hold a moment so the tenant can read the last line.
         const t = setTimeout(() => onComplete?.(), 800);
         return () => clearTimeout(t);
       }
@@ -44,7 +107,7 @@ export function SchemaScan({ tables, onComplete }: Props) {
     const delay = lines[visible]?.startsWith("•") ? 360 : 600;
     const t = setTimeout(() => setVisible((v) => v + 1), delay);
     return () => clearTimeout(t);
-  }, [visible, lines, onComplete]);
+  }, [visible, lines, onComplete, usingAI, streamingDone]);
 
   return (
     <div
@@ -75,7 +138,7 @@ export function SchemaScan({ tables, onComplete }: Props) {
 
       <ul
         aria-live="polite"
-        aria-busy={visible < lines.length}
+        aria-busy={usingAI ? !streamingDone : visible < lines.length}
         style={{
           margin: 0,
           padding: 0,
@@ -89,7 +152,7 @@ export function SchemaScan({ tables, onComplete }: Props) {
           lineHeight: "var(--leading-snug)",
         }}
       >
-        {lines.slice(0, visible).map((l, i) => (
+        {lines.slice(0, usingAI ? lines.length : visible).map((l, i) => (
           <li
             key={`${i}-${l}`}
             style={{
@@ -102,7 +165,7 @@ export function SchemaScan({ tables, onComplete }: Props) {
             {l}
           </li>
         ))}
-        {visible < lines.length && (
+        {(usingAI ? !streamingDone : visible < lines.length) && (
           <li style={{ color: "var(--color-fg-subtle)" }}>
             <span
               aria-hidden

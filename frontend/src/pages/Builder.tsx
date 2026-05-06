@@ -11,7 +11,7 @@
  */
 import { ArrowLeft, Save, X } from "lucide-react";
 import { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { AskAIPanel } from "../builder/AskAIPanel";
 import { BuilderPreview } from "../builder/BuilderPreview";
 import { type Door, DoorTabs } from "../builder/DoorTabs";
@@ -33,7 +33,14 @@ const DEFAULT_SPEC = (table: SchemaTable): QuerySpec => ({
 });
 
 export function BuilderPage() {
-  const [door, setDoor] = useState<Door>("visual");
+  const [search] = useSearchParams();
+  const initialDoor = (search.get("door") as Door | null) ?? "visual";
+  const initialPrompt = search.get("q") ?? undefined;
+  const [door, setDoor] = useState<Door>(
+    initialDoor === "ai" || initialDoor === "visual" || initialDoor === "sql"
+      ? initialDoor
+      : "visual",
+  );
   const [table, setTable] = useState<SchemaTable>(SAMPLE_TABLES[0]!);
   const [spec, setSpec] = useState<QuerySpec>(() => DEFAULT_SPEC(table));
   const [sql, setSql] = useState<string>(
@@ -122,6 +129,7 @@ export function BuilderPage() {
           {door === "ai" && (
             <AskAIPanel
               table={table}
+              initialPrompt={initialPrompt}
               onApply={(generated, _question) => {
                 setSpec(generated);
                 setDoor("visual");

@@ -32,6 +32,12 @@ export default defineConfig({
       port: 5173,
       reuseExistingServer: !process.env.CI,
       timeout: 30_000,
+      env: {
+        // Disable real Ollama Cloud calls during e2e — components fall
+        // back to deterministic mocks. Dev runs (`make dev`) leave this
+        // unset so AI features wire to the real provider.
+        VITE_ARC_AI_DISABLED: "true",
+      },
     },
   ],
 });
