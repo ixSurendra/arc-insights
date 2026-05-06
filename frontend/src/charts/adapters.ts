@@ -11,6 +11,7 @@ import {
   type PieConfig,
   type ScatterConfig,
   type TableConfig,
+  type ValueFormat,
 } from "./types";
 
 type EChartsOption = Record<string, unknown>;
@@ -19,6 +20,31 @@ function asNumber(v: unknown): number | null {
   if (v === null || v === undefined) return null;
   const n = typeof v === "number" ? v : Number(v);
   return Number.isFinite(n) ? n : null;
+}
+
+function compactNumber(v: number, currency?: string): string {
+  const abs = Math.abs(v);
+  const prefix = currency === "USD" || !currency ? "$" : "";
+  let body: string;
+  if (abs >= 1_000_000)
+    body = `${(v / 1_000_000).toFixed(abs >= 10_000_000 ? 0 : 1)}M`;
+  else if (abs >= 1_000) body = `${Math.round(v / 1_000)}k`;
+  else body = `${Math.round(v)}`;
+  return `${prefix}${body}`;
+}
+
+function valueAxisFormatter(format?: ValueFormat, currency?: string) {
+  if (!format) return undefined;
+  switch (format) {
+    case "currency":
+      return (v: number) => compactNumber(v, currency ?? "USD");
+    case "percent":
+      return (v: number) => `${(v * 100).toFixed(1)}%`;
+    case "number":
+    default:
+      return (v: number) =>
+        Math.abs(v) >= 1_000 ? compactNumber(v).replace("$", "") : `${v}`;
+  }
 }
 
 export function toLineOption(
@@ -30,16 +56,24 @@ export function toLineOption(
     name: col,
     type: "line",
     data: data.rows.map((r) => asNumber(r[col])),
-    ...(config.area ? { areaStyle: {} } : {}),
+    showSymbol: true,
+    symbol: "circle",
+    symbolSize: 6,
+    ...(config.area ? { areaStyle: { opacity: 0.18 } } : {}),
     smooth: true,
   }));
+  const fmt = valueAxisFormatter(config.valueFormat, config.currency);
   return {
     title: config.title ? { text: config.title, left: "center" } : undefined,
     tooltip: { trigger: "axis" },
     legend: config.yAxes.length > 1 ? { top: "bottom" } : undefined,
-    grid: { left: 48, right: 16, top: config.title ? 48 : 16, bottom: 56 },
-    xAxis: { type: "category", data: categories },
-    yAxis: { type: "value" },
+    grid: { left: 56, right: 16, top: config.title ? 48 : 16, bottom: 56 },
+    xAxis: { type: "category", data: categories, boundaryGap: false },
+    yAxis: {
+      type: "value",
+      axisLabel: fmt ? { formatter: fmt } : undefined,
+      splitLine: { lineStyle: { opacity: 0.5 } },
+    },
     series,
   };
 }
@@ -47,18 +81,33 @@ export function toLineOption(
 export function toBarOption(config: BarConfig, data: ChartData): EChartsOption {
   const horizontal = config.orientation === "horizontal";
   const categories = data.rows.map((r) => r[config.xAxis] as string | number);
+  const fmt = valueAxisFormatter(config.valueFormat, config.currency);
   const series = config.yAxes.map((col) => ({
     name: col,
     type: "bar",
     data: data.rows.map((r) => asNumber(r[col])),
+    ...(config.showValueLabels && fmt
+      ? {
+          label: {
+            show: true,
+            position: horizontal ? "right" : "top",
+            formatter: ({ value }: { value: number | null }) =>
+              value === null || value === undefined ? "" : fmt(Number(value)),
+          },
+        }
+      : {}),
   }));
   const categoryAxis = { type: "category" as const, data: categories };
-  const valueAxis = { type: "value" as const };
+  const valueAxis = {
+    type: "value" as const,
+    axisLabel: fmt ? { formatter: fmt } : undefined,
+    splitLine: { lineStyle: { opacity: 0.5 } },
+  };
   return {
     title: config.title ? { text: config.title, left: "center" } : undefined,
     tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
     legend: config.yAxes.length > 1 ? { top: "bottom" } : undefined,
-    grid: { left: 64, right: 16, top: config.title ? 48 : 16, bottom: 56 },
+    grid: { left: 96, right: 24, top: config.title ? 48 : 16, bottom: 40 },
     xAxis: horizontal ? valueAxis : categoryAxis,
     yAxis: horizontal ? categoryAxis : valueAxis,
     series,

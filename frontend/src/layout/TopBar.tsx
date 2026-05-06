@@ -1,12 +1,15 @@
-import { Moon, Search, Sun } from "lucide-react";
+import { Moon, Search, Shield, Sun } from "lucide-react";
 import { useState } from "react";
-import { Button } from "../ui/Button";
 import {
   applyTheme,
   getInitialTheme,
   toggleTheme,
   type Theme,
 } from "../lib/theme";
+import { IconButton } from "../ui/IconButton";
+import { Logo } from "../ui/Logo";
+import { UserAvatar } from "./UserAvatar";
+import { WorkspacePill } from "./WorkspacePill";
 
 export function TopBar() {
   const [theme, setLocalTheme] = useState<Theme>(getInitialTheme);
@@ -26,41 +29,8 @@ export function TopBar() {
         zIndex: 10,
       }}
     >
-      {/* Workspace switcher placeholder */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "var(--space-2)",
-          fontSize: "var(--text-base)",
-          fontWeight: 600,
-        }}
-      >
-        <div
-          aria-hidden
-          style={{
-            width: 24,
-            height: 24,
-            borderRadius: "var(--radius-sm)",
-            background:
-              "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
-          }}
-        />
-        Arc Insights
-        <span
-          style={{
-            fontSize: "var(--text-xs)",
-            fontWeight: 500,
-            color: "var(--color-fg-muted)",
-            padding: "2px var(--space-2)",
-            borderRadius: "var(--radius-full)",
-            border: "1px solid var(--color-border)",
-            marginLeft: "var(--space-2)",
-          }}
-        >
-          Acme · Production
-        </span>
-      </div>
+      <Logo variant="wordmark" size={22} />
+      <WorkspacePill workspace="Acme" environment="Production" branch="main" />
 
       {/* Global search / Cmd+K placeholder */}
       <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
@@ -71,7 +41,7 @@ export function TopBar() {
             display: "flex",
             alignItems: "center",
             gap: "var(--space-2)",
-            width: 360,
+            width: 420,
             maxWidth: "100%",
             height: 32,
             padding: "0 var(--space-3)",
@@ -85,7 +55,7 @@ export function TopBar() {
           }}
         >
           <Search size={14} />
-          <span>Search dashboards, queries, metrics…</span>
+          <span>Search dashboards, queries, metrics, columns…</span>
           <span
             style={{
               marginLeft: "auto",
@@ -102,21 +72,31 @@ export function TopBar() {
         </button>
       </div>
 
-      <Button
-        variant="ghost"
-        size="sm"
-        aria-label={
-          theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
-        }
-        onClick={() => {
-          const next = toggleTheme(theme);
-          applyTheme(next);
-          setLocalTheme(next);
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "var(--space-2)",
         }}
-        iconLeft={theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
       >
-        {theme === "dark" ? "Light" : "Dark"}
-      </Button>
+        <IconButton aria-label="Security & audit" size="sm">
+          <Shield size={14} />
+        </IconButton>
+        <IconButton
+          aria-label={
+            theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+          }
+          size="sm"
+          onClick={() => {
+            const next = toggleTheme(theme);
+            applyTheme(next);
+            setLocalTheme(next);
+          }}
+        >
+          {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
+        </IconButton>
+        <UserAvatar initials="AM" />
+      </div>
     </header>
   );
 }

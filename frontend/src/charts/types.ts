@@ -28,6 +28,9 @@ interface BaseConfig {
   title?: string;
 }
 
+/** Format hint for value axes — drives axis tick + tooltip formatters. */
+export type ValueFormat = "number" | "currency" | "percent";
+
 export interface LineConfig extends BaseConfig {
   type: "line";
   xAxis: string;
@@ -35,6 +38,9 @@ export interface LineConfig extends BaseConfig {
   yAxes: string[];
   /** Render area below the line — gives a stacked-area look. */
   area?: boolean;
+  valueFormat?: ValueFormat;
+  /** ISO currency code when valueFormat='currency'. Default "USD". */
+  currency?: string;
 }
 
 export interface BarConfig extends BaseConfig {
@@ -42,6 +48,10 @@ export interface BarConfig extends BaseConfig {
   xAxis: string;
   yAxes: string[];
   orientation?: "vertical" | "horizontal";
+  valueFormat?: ValueFormat;
+  currency?: string;
+  /** Render value labels at the end of each bar (mostly useful for horizontal). */
+  showValueLabels?: boolean;
 }
 
 export interface PieConfig extends BaseConfig {
