@@ -19,6 +19,8 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Chart } from "../charts/Chart";
 import type { ChartConfig } from "../charts/types";
+import { DASHBOARD_TEMPLATES } from "../templates/dashboard-templates";
+import { SmartFillDialog } from "../templates/SmartFillDialog";
 
 // ─── Sample data (replaced by API in P1-10 / P1-12) ────────────────
 const PINNED_DASHBOARDS = [
@@ -1476,35 +1478,8 @@ function RecentReportList() {
 }
 
 // ─── Dashboard templates (gated by dashboard count) ────────────────
-const TEMPLATE_PICKS = [
-  {
-    id: "executive",
-    title: "Executive overview",
-    blurb: "4 KPIs · trend · geo · top-N table",
-  },
-  {
-    id: "sales-pipeline",
-    title: "Sales pipeline",
-    blurb: "Funnel · deals by stage · win rate · top reps · forecast",
-  },
-  {
-    id: "marketing",
-    title: "Marketing performance",
-    blurb: "Channel mix · campaigns · conversion funnel · weekly trend",
-  },
-  {
-    id: "ops",
-    title: "Operations / health",
-    blurb: "Uptime · p99 latency · errors · top failures",
-  },
-  {
-    id: "saas",
-    title: "SaaS metrics",
-    blurb: "DAU/MAU · activation funnel · retention cohort · adoption",
-  },
-];
-
 function TemplatesGrid() {
+  const [pickedTemplate, setPickedTemplate] = useState<string | null>(null);
   return (
     <div
       style={{
@@ -1513,23 +1488,42 @@ function TemplatesGrid() {
         gap: "var(--space-3)",
       }}
     >
-      {TEMPLATE_PICKS.map((t) => (
-        <Link
+      {DASHBOARD_TEMPLATES.map((t) => (
+        <button
           key={t.id}
-          to={`/dashboards/new?template=${t.id}`}
+          type="button"
+          onClick={() => setPickedTemplate(t.id)}
+          data-testid={`home-template-${t.id}`}
           className="arc-card-lift"
           style={{
             background: "var(--color-bg-elev)",
             border: "1px solid var(--color-border)",
             borderRadius: "var(--radius-lg)",
             padding: "var(--space-4)",
-            textDecoration: "none",
             color: "inherit",
             display: "flex",
             flexDirection: "column",
             gap: "var(--space-2)",
+            textAlign: "left",
+            fontFamily: "inherit",
+            cursor: "pointer",
           }}
         >
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "var(--color-primary)",
+            }}
+          >
+            <Sparkles size={11} />
+            Smart-fill
+          </span>
           <div
             style={{
               fontSize: "var(--text-sm)",
@@ -1546,10 +1540,16 @@ function TemplatesGrid() {
               lineHeight: "var(--leading-snug)",
             }}
           >
-            {t.blurb}
+            {t.description}
           </div>
-        </Link>
+        </button>
       ))}
+      {pickedTemplate && (
+        <SmartFillDialog
+          templateId={pickedTemplate}
+          onClose={() => setPickedTemplate(null)}
+        />
+      )}
     </div>
   );
 }

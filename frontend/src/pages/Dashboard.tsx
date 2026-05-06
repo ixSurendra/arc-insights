@@ -1,38 +1,44 @@
 /**
- * Dashboard view — Phase 1 grid skeleton.
+ * Dashboard view — Phase 1 grid skeleton, store-backed.
  *
- * Replaces the notebook canvas with the locked Metabase-style grid.
- * Header, filter bar, responsive grid of mock widgets, hybrid edit
- * affordance (per-widget pencil) — all in place. Real persistence,
- * drag-resize, and AI surfaces wire in with P1-09 / P1-31..P1-35.
+ * Reads the selected dashboard from the dashboards store by URL id.
+ * Falls back to "sales-overview" for the legacy /dashboard route.
+ * Widgets that have known mock data (the seed sales-overview record)
+ * render rich; smart-fill widgets render a structural placeholder
+ * with their kind, title, and source description until real query
+ * execution wires in.
  */
 import {
   ArrowDown,
+  BarChart3,
   Calendar,
   Filter,
+  Hash,
+  type LucideIcon,
+  MapPin,
   MoreHorizontal,
   Pencil,
+  PieChart,
   RefreshCw,
   Share2,
   Sparkles,
   Star,
+  Table as TableIcon,
+  TrendingUp,
+  Users,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useParams } from "react-router-dom";
 import { Chart } from "../charts/Chart";
 import type { ChartConfig } from "../charts/types";
+import { useDashboards } from "../dashboards/store";
+import type {
+  DashboardRecord,
+  DashboardWidget,
+  DashboardWidgetKind,
+} from "../dashboards/types";
 import { PageHeader } from "../layout/AppShell";
 import { Button } from "../ui/Button";
 import { StatusBadge } from "../ui/StatusBadge";
-
-interface DashboardWidget {
-  id: string;
-  title: string;
-  type: "kpi" | "line" | "bar" | "donut" | "table";
-  /** Grid span — { cols, rows } at desktop. Tablet halves cols, mobile = 1. */
-  span: { cols: 1 | 2 | 3 | 4; rows: 1 | 2 };
-  /** Mock data for rendering. */
-  data?: Record<string, unknown>;
-}
 
 const FILTERS = [
   { label: "Last 90 days", icon: Calendar },
@@ -40,127 +46,124 @@ const FILTERS = [
   { label: "All segments", icon: Filter },
 ];
 
-const WIDGETS: DashboardWidget[] = [
-  {
-    id: "kpi-revenue",
-    title: "Revenue · Q2 to date",
-    type: "kpi",
-    span: { cols: 1, rows: 1 },
-    data: {
+const KIND_ICON: Record<DashboardWidgetKind, LucideIcon> = {
+  "kpi-card": Users,
+  "big-number": Hash,
+  line: TrendingUp,
+  column: BarChart3,
+  bar: BarChart3,
+  donut: PieChart,
+  pie: PieChart,
+  choropleth: MapPin,
+  table: TableIcon,
+};
+
+interface MockData {
+  kpi?: { value: string; delta?: string; dir: "up" | "down"; spark: number[] };
+  bigNumber?: { value: string };
+  line?: Array<Record<string, string | number>>;
+  bar?: Array<{ cat: string; value: number }>;
+  donut?: Array<{ name: string; value: number }>;
+  table?: Array<Record<string, string | number>>;
+}
+
+const MOCK_BY_WIDGET_ID: Record<string, MockData> = {
+  "kpi-revenue": {
+    kpi: {
       value: "$405k",
       delta: "+14.2%",
       dir: "up",
       spark: [120, 135, 148, 162, 178, 195, 215, 240],
     },
   },
-  {
-    id: "kpi-orders",
-    title: "Orders · Q2 to date",
-    type: "kpi",
-    span: { cols: 1, rows: 1 },
-    data: {
-      value: "9,648",
-      delta: "+8.4%",
-      dir: "up",
-      spark: [800, 812, 850, 880, 905, 920, 940, 968],
-    },
-  },
-  {
-    id: "kpi-aov",
-    title: "Average order value",
-    type: "kpi",
-    span: { cols: 1, rows: 1 },
-    data: {
+  "kpi-orders": { bigNumber: { value: "9,648" } },
+  "kpi-aov": {
+    kpi: {
       value: "$42.0",
       delta: "+1.3%",
       dir: "up",
       spark: [40, 41, 41, 42, 42, 41, 42, 42],
     },
   },
-  {
-    id: "kpi-customers",
-    title: "Active customers",
-    type: "kpi",
-    span: { cols: 1, rows: 1 },
-    data: {
-      value: "2,841",
-      delta: "−2.1%",
-      dir: "down",
-      spark: [2900, 2890, 2870, 2860, 2850, 2845, 2842, 2841],
-    },
+  "kpi-customers": { bigNumber: { value: "2,841" } },
+  "trend-revenue": {
+    line: [
+      { q: "Q1 24", rev: 123900, ord: 2100 },
+      { q: "Q2 24", rev: 142400, ord: 8800 },
+      { q: "Q3 24", rev: 141800, ord: 5400 },
+      { q: "Q4 24", rev: 141900, ord: 9500 },
+      { q: "Q1 25", rev: 130800, ord: 2700 },
+      { q: "Q2 25", rev: 145000, ord: 9200 },
+    ],
   },
-  {
-    id: "trend-revenue",
-    title: "Revenue and orders over time",
-    type: "line",
-    span: { cols: 2, rows: 2 },
-    data: {
-      points: [
-        { q: "Q1 24", rev: 123900, ord: 2100 },
-        { q: "Q2 24", rev: 142400, ord: 8800 },
-        { q: "Q3 24", rev: 141800, ord: 5400 },
-        { q: "Q4 24", rev: 141900, ord: 9500 },
-        { q: "Q1 25", rev: 130800, ord: 2700 },
-        { q: "Q2 25", rev: 145000, ord: 9200 },
-      ],
-    },
+  "donut-categories": {
+    donut: [
+      { name: "Doohickey", value: 21 },
+      { name: "Gadget", value: 27 },
+      { name: "Gizmo", value: 25 },
+      { name: "Widget", value: 27 },
+    ],
   },
-  {
-    id: "donut-categories",
-    title: "Total orders by product category",
-    type: "donut",
-    span: { cols: 2, rows: 2 },
-    data: {
-      slices: [
-        { name: "Doohickey", value: 21 },
-        { name: "Gadget", value: 27 },
-        { name: "Gizmo", value: 25 },
-        { name: "Widget", value: 27 },
-      ],
-    },
+  "bar-categories": {
+    bar: [
+      { cat: "Doohickey", value: 11800 },
+      { cat: "Gadget", value: 12100 },
+      { cat: "Gizmo", value: 12900 },
+      { cat: "Widget", value: 14000 },
+    ],
   },
-  {
-    id: "bar-categories",
-    title: "Revenue by product category",
-    type: "bar",
-    span: { cols: 2, rows: 2 },
-    data: {
-      bars: [
-        { cat: "Doohickey", value: 11800 },
-        { cat: "Gadget", value: 12100 },
-        { cat: "Gizmo", value: 12900 },
-        { cat: "Widget", value: 14000 },
-      ],
-    },
+  "table-events": {
+    table: [
+      { plan: "Basic", event: "Button Clicked", q1: 785, q2: 412 },
+      { plan: "Basic", event: "Page Viewed", q1: 5006, q2: 2412 },
+      { plan: "Business", event: "Button Clicked", q1: 4, q2: 6 },
+      { plan: "Business", event: "Page Viewed", q1: 9, q2: 12 },
+      { plan: "Premium", event: "Button Clicked", q1: 35, q2: 41 },
+      { plan: "Premium", event: "Page Viewed", q1: 279, q2: 312 },
+    ],
   },
-  {
-    id: "table-events",
-    title: "Events by quarter",
-    type: "table",
-    span: { cols: 2, rows: 2 },
-    data: {
-      rows: [
-        { plan: "Basic", event: "Button Clicked", q1: 785, q2: 412 },
-        { plan: "Basic", event: "Page Viewed", q1: 5006, q2: 2412 },
-        { plan: "Business", event: "Button Clicked", q1: 4, q2: 6 },
-        { plan: "Business", event: "Page Viewed", q1: 9, q2: 12 },
-        { plan: "Premium", event: "Button Clicked", q1: 35, q2: 41 },
-        { plan: "Premium", event: "Page Viewed", q1: 279, q2: 312 },
-      ],
-    },
-  },
-];
+};
 
 export function DashboardPage() {
+  const { id: routeId } = useParams<{ id: string }>();
+  const id = routeId ?? "sales-overview";
+  const dashboard = useDashboards((s) => s.byId(id));
+
+  if (!dashboard) {
+    return (
+      <div style={{ padding: "var(--space-5) var(--space-6)" }}>
+        <PageHeader
+          breadcrumb="Workspace · Acme · Dashboards"
+          title="Dashboard not found"
+          description={`No dashboard with id "${id}". It may have been deleted, or you came from a stale link.`}
+        />
+      </div>
+    );
+  }
+
+  return <DashboardView dashboard={dashboard} />;
+}
+
+function DashboardView({ dashboard }: { dashboard: DashboardRecord }) {
   return (
     <div style={{ padding: "var(--space-5) var(--space-6)" }}>
       <PageHeader
         breadcrumb="Workspace · Acme · Dashboards"
-        title="Sales overview"
+        title={dashboard.title}
         titleIcon={<Star size={18} fill="currentColor" stroke="currentColor" />}
-        tag="Finance"
-        status={<StatusBadge tone="live">Live · refreshed 12s ago</StatusBadge>}
-        description="Q2 sales performance — revenue, orders, AOV, and category breakdown. Filters at the top apply to every widget."
+        tag={dashboard.folder}
+        status={
+          <StatusBadge tone={dashboard.status === "stale" ? "warn" : "live"}>
+            {dashboard.status === "stale"
+              ? "Stale · refresh to update"
+              : "Live · refreshed just now"}
+          </StatusBadge>
+        }
+        description={
+          dashboard.generatedFromTemplate
+            ? `Smart-filled from the "${dashboard.generatedFromTemplate}" template. Filters at the top apply to every widget.`
+            : "Filters at the top apply to every widget on the page."
+        }
         toolbar={
           <Button variant="ghost" iconLeft={<RefreshCw size={14} />} size="sm">
             Refresh
@@ -184,26 +187,30 @@ export function DashboardPage() {
         }
       />
 
-      <FilterBar />
+      <FilterBar widgetCount={dashboard.widgets.length} />
 
-      <div
-        data-testid="dashboard-grid"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-          gridAutoRows: "minmax(140px, auto)",
-          gap: "var(--space-4)",
-        }}
-      >
-        {WIDGETS.map((w) => (
-          <WidgetTile key={w.id} widget={w} />
-        ))}
-      </div>
+      {dashboard.widgets.length === 0 ? (
+        <EmptyDashboard />
+      ) : (
+        <div
+          data-testid="dashboard-grid"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+            gridAutoRows: "minmax(140px, auto)",
+            gap: "var(--space-4)",
+          }}
+        >
+          {dashboard.widgets.map((w) => (
+            <WidgetTile key={w.id} widget={w} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function FilterBar() {
+function FilterBar({ widgetCount }: { widgetCount: number }) {
   return (
     <div
       role="toolbar"
@@ -262,17 +269,42 @@ function FilterBar() {
           marginLeft: "auto",
         }}
       >
-        3 active filters apply to all 8 widgets
+        3 active filters apply to all {widgetCount} widget
+        {widgetCount === 1 ? "" : "s"}
       </span>
     </div>
   );
 }
 
+function EmptyDashboard() {
+  return (
+    <div
+      style={{
+        padding: "var(--space-12) var(--space-6)",
+        textAlign: "center",
+        color: "var(--color-fg-muted)",
+        background: "var(--color-bg-elev)",
+        border: "1px dashed var(--color-border-strong)",
+        borderRadius: "var(--radius-lg)",
+      }}
+    >
+      <div style={{ fontWeight: 600, color: "var(--color-fg)" }}>
+        No widgets yet
+      </div>
+      <div style={{ marginTop: 8, fontSize: "var(--text-sm)" }}>
+        Pick a template on the Home page or click + New widget to add the first
+        one.
+      </div>
+    </div>
+  );
+}
+
 function WidgetTile({ widget }: { widget: DashboardWidget }) {
+  const mock = MOCK_BY_WIDGET_ID[widget.id];
   return (
     <article
       data-testid={`widget-${widget.id}`}
-      data-widget-type={widget.type}
+      data-widget-type={widget.kind}
       className="arc-card-lift arc-widget-tile"
       style={{
         gridColumn: `span ${widget.span.cols}`,
@@ -334,7 +366,7 @@ function WidgetTile({ widget }: { widget: DashboardWidget }) {
       </header>
 
       <div style={{ flex: 1, minHeight: 0 }}>
-        <WidgetBody widget={widget} />
+        <WidgetBody widget={widget} mock={mock} />
       </div>
     </article>
   );
@@ -353,14 +385,15 @@ const iconButtonStyle: React.CSSProperties = {
   justifyContent: "center",
 };
 
-function WidgetBody({ widget }: { widget: DashboardWidget }): ReactNode {
-  if (widget.type === "kpi") {
-    const d = widget.data as {
-      value: string;
-      delta: string;
-      dir: "up" | "down";
-      spark: number[];
-    };
+function WidgetBody({
+  widget,
+  mock,
+}: {
+  widget: DashboardWidget;
+  mock: MockData | undefined;
+}) {
+  if (mock?.kpi) {
+    const d = mock.kpi;
     return (
       <div
         style={{
@@ -382,19 +415,21 @@ function WidgetBody({ widget }: { widget: DashboardWidget }): ReactNode {
         >
           {d.value}
         </div>
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 4,
-            fontSize: 12,
-            fontWeight: 600,
-            color:
-              d.dir === "up" ? "var(--color-success)" : "var(--color-danger)",
-          }}
-        >
-          {d.delta}
-        </div>
+        {d.delta && (
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+              fontSize: 12,
+              fontWeight: 600,
+              color:
+                d.dir === "up" ? "var(--color-success)" : "var(--color-danger)",
+            }}
+          >
+            {d.delta}
+          </div>
+        )}
         <div style={{ flex: 1, minHeight: 32 }}>
           <Chart
             config={{ type: "line", xAxis: "i", yAxes: ["v"], area: true }}
@@ -405,40 +440,96 @@ function WidgetBody({ widget }: { widget: DashboardWidget }): ReactNode {
       </div>
     );
   }
-  if (widget.type === "line") {
-    const d = widget.data as {
-      points: Array<{ q: string; rev: number; ord: number }>;
-    };
+  if (mock?.bigNumber) {
+    return (
+      <div
+        style={{
+          fontSize: "var(--text-2xl)",
+          fontWeight: 700,
+          letterSpacing: "-0.02em",
+          color: "var(--color-fg)",
+          fontFamily: "var(--font-mono)",
+          lineHeight: 1,
+        }}
+      >
+        {mock.bigNumber.value}
+      </div>
+    );
+  }
+  if (mock?.line) {
     return (
       <Chart
         config={{ type: "line", xAxis: "q", yAxes: ["rev", "ord"] }}
-        data={{ rows: d.points }}
+        data={{ rows: mock.line }}
         height={260}
       />
     );
   }
-  if (widget.type === "bar") {
-    const d = widget.data as { bars: Array<{ cat: string; value: number }> };
+  if (mock?.bar) {
     const config: ChartConfig = { type: "bar", xAxis: "cat", yAxes: ["value"] };
-    return <Chart config={config} data={{ rows: d.bars }} height={260} />;
+    return <Chart config={config} data={{ rows: mock.bar }} height={260} />;
   }
-  if (widget.type === "donut") {
-    const d = widget.data as { slices: Array<{ name: string; value: number }> };
+  if (mock?.donut) {
     const config: ChartConfig = {
       type: "pie",
       category: "name",
       value: "value",
       variant: "donut",
     };
-    return <Chart config={config} data={{ rows: d.slices }} height={260} />;
+    return <Chart config={config} data={{ rows: mock.donut }} height={260} />;
   }
-  if (widget.type === "table") {
-    const d = widget.data as {
-      rows: Array<Record<string, string | number>>;
-    };
+  if (mock?.table) {
     return (
-      <Chart config={{ type: "table" }} data={{ rows: d.rows }} height={260} />
+      <Chart
+        config={{ type: "table" }}
+        data={{ rows: mock.table }}
+        height={260}
+      />
     );
   }
-  return null;
+
+  // Smart-fill widget without registered mock data — render a clean
+  // structural placeholder citing the source the AI generated.
+  const Icon = KIND_ICON[widget.kind];
+  return (
+    <div
+      style={{
+        height: "100%",
+        minHeight: widget.span.rows === 1 ? 60 : 200,
+        background:
+          "linear-gradient(135deg, rgba(34, 211, 238, 0.06), rgba(56, 189, 248, 0.03))",
+        border: "1px dashed var(--color-border-strong)",
+        borderRadius: "var(--radius-md)",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 6,
+        color: "var(--color-fg-muted)",
+        padding: "var(--space-3)",
+        textAlign: "center",
+      }}
+    >
+      <Icon size={20} style={{ color: "var(--color-primary)" }} />
+      <div
+        style={{
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+        }}
+      >
+        {widget.kind}
+      </div>
+      <div
+        style={{
+          fontSize: 11,
+          fontFamily: "var(--font-mono)",
+          maxWidth: 280,
+        }}
+      >
+        {widget.source}
+      </div>
+    </div>
+  );
 }
