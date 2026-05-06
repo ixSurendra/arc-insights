@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Chart } from "../charts/Chart";
 import type { ChartConfig, ChartType } from "../charts/types";
 import { Card, CardHeader } from "../ui/Card";
@@ -8,6 +8,8 @@ import type { QuerySpec } from "./types";
 interface Props {
   spec: QuerySpec;
   rows: Array<Record<string, unknown>>;
+  /** Notifies the parent (Builder right panel) of the active chart type. */
+  onChartTypeChange?: (chartType: string) => void;
 }
 
 const TYPES: Array<{ value: ChartType; label: string }> = [
@@ -18,8 +20,11 @@ const TYPES: Array<{ value: ChartType; label: string }> = [
   { value: "big_number", label: "Big number" },
 ];
 
-export function BuilderPreview({ spec, rows }: Props) {
+export function BuilderPreview({ spec, rows, onChartTypeChange }: Props) {
   const [chartType, setChartType] = useState<ChartType>("table");
+  useEffect(() => {
+    onChartTypeChange?.(chartType);
+  }, [chartType, onChartTypeChange]);
   const result = useMemo(() => previewExecute(spec, rows), [spec, rows]);
   const sql = useMemo(() => previewSql(spec), [spec]);
   const config = useMemo(

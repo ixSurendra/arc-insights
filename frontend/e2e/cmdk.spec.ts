@@ -21,5 +21,5 @@ test("Ctrl+K opens the palette and selecting an item routes", async ({
   await page.keyboard.press("Enter");
 
   await expect(page).toHaveURL(/\/builder/);
-  await expect(page.getByRole("heading", { name: "New query" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "New widget" })).toBeVisible();
 });
