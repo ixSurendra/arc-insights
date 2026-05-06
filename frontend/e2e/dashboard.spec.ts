@@ -1,30 +1,30 @@
 import { test, expect } from "@playwright/test";
 
 /**
- * Dashboard now renders as a notebook (Hex-style). Verify the title,
- * a few of the cell types render, and Run all flips the status badge.
+ * Dashboard view renders the locked Metabase-style grid: title in the
+ * page header, a filter bar, and multiple widget tiles (KPIs, line,
+ * bar, donut, table) on a responsive grid.
  */
-test("notebook page renders cells with the new design", async ({ page }) => {
+test("dashboard renders the widget grid", async ({ page }) => {
   await page.goto("/dashboard");
 
   await expect(
-    page.getByRole("heading", { name: "Sales overview" }),
-  ).toBeVisible({
-    timeout: 10_000,
-  });
+    page.getByRole("heading", { level: 1, name: /Sales overview/i }),
+  ).toBeVisible({ timeout: 10_000 });
 
-  // The headline big-number cell.
+  // Filter bar present
+  await expect(
+    page.getByRole("toolbar", { name: "Dashboard filters" }),
+  ).toBeVisible();
+
+  // The grid is rendered and at least one widget tile is visible
+  await expect(page.getByTestId("dashboard-grid")).toBeVisible();
+  await expect(page.getByTestId("widget-kpi-revenue")).toBeVisible();
+
+  // Headline KPI value
   await expect(page.getByText("$405k")).toBeVisible();
 
-  // A SQL cell — keyword highlighting won't matter to the test, but the
-  // SQL content should be present.
-  await expect(page.getByText(/Monthly revenue by region/)).toBeVisible();
-
-  // A chart cell (line/area). ECharts paints a canvas inside any chart
-  // cell — at least one canvas should be visible.
+  // ECharts paints into a canvas — at least one canvas should be present
+  // for the line/bar/donut widgets.
   await expect(page.locator("canvas").first()).toBeVisible({ timeout: 5_000 });
-
-  // Run all flips the status badge to "Running…" briefly.
-  await page.getByRole("button", { name: /Run all/ }).click();
-  await expect(page.getByText(/Running/)).toBeVisible({ timeout: 2_000 });
 });

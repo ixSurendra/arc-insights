@@ -8,14 +8,13 @@
  */
 import {
   BarChart3,
-  Code2,
   Database,
+  FileText,
+  Home,
   Layers,
-  LayoutDashboard,
   type LucideIcon,
   PanelsTopLeft,
   Settings,
-  Star,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
@@ -24,17 +23,15 @@ interface Item {
   label: string;
   href: string;
   end?: boolean;
-  starred?: boolean;
 }
 
 const PRIMARY: Item[] = [
-  { icon: LayoutDashboard, label: "Overview", href: "/", end: true },
-  { icon: PanelsTopLeft, label: "Dashboards", href: "/dashboard" },
-  { icon: BarChart3, label: "Builder", href: "/builder" },
-  { icon: Code2, label: "SQL", href: "/sql" },
-  { icon: Database, label: "Data sources", href: "/data-sources" },
-  { icon: Layers, label: "Models", href: "/models" },
-  { icon: PanelsTopLeft, label: "Embed", href: "/embed", starred: true },
+  { icon: Home, label: "Home", href: "/", end: true },
+  { icon: PanelsTopLeft, label: "Dashboards", href: "/dashboards" },
+  { icon: BarChart3, label: "Widgets", href: "/widgets" },
+  { icon: FileText, label: "Reports", href: "/reports" },
+  { icon: Layers, label: "Data Model", href: "/data-model" },
+  { icon: Database, label: "Data Sources", href: "/data-sources" },
 ];
 
 const SECONDARY: Item[] = [
@@ -72,7 +69,7 @@ export function ActivityRail() {
   );
 }
 
-function RailItem({ icon: Icon, label, href, end, starred }: Item) {
+function RailItem({ icon: Icon, label, href, end }: Item) {
   return (
     <NavLink
       to={href}
@@ -112,19 +109,6 @@ function RailItem({ icon: Icon, label, href, end, starred }: Item) {
             />
           )}
           <Icon size={18} />
-          {starred && (
-            <Star
-              size={9}
-              fill="var(--color-accent)"
-              stroke="var(--color-accent)"
-              style={{
-                position: "absolute",
-                top: 6,
-                right: 6,
-              }}
-              aria-hidden
-            />
-          )}
         </>
       )}
     </NavLink>

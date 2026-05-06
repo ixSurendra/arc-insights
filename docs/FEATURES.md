@@ -8,6 +8,35 @@ The complete inventory of what Arc Insights does, organized by category. **157 f
 
 ---
 
+## Phase 1 lock (2026-05-06)
+
+The product was realigned from a notebook-canvas direction to a Metabase-style dashboard-first BI tool. Phase 1 ships the **core BI loop**; auth/RBAC/billing/audit/embed-JWT integration with the `ix-copilot` foundation lands in Phase 2. See [UX-SPEC.md](UX-SPEC.md) for binding behavior contracts.
+
+**In Phase 1:**
+
+- **Data layer** — Postgres / MySQL / BigQuery / Snowflake connectors · CSV upload · schema scan with AI narration · Data Model surface (semantic layer "B-plus": friendly names, FK display labels, field types, hidden columns, calculated fields, named metrics, pre-defined joins, row-level access policy definitions)
+- **Widgets** — three-door builder (Ask AI · Visual · SQL) · live preview configurator · 18 chart types + 3 containers · widget library page · edit-once-update-everywhere with explicit Fork
+- **Dashboards** — responsive grid (desktop / tablet / mobile) · hybrid edit mode · global filter bar · drill-down · 3-level theming (workspace / dashboard / widget) · pastel chart palette default · embedded view (bare grid + filters)
+- **Reports** — flowing document · 3 templates · scheduled email UI · PDF/CSV/XLSX exports · versioning · AI auto-summary · public link sharing (tenant-gated)
+- **AI** — Ollama Cloud as default provider · Ask AI conversational · Explain/Auto-name/Anomaly one-shot · streaming with visible reasoning · write-with-confirm · never-fake + always-cite contracts · BYO-LLM capability detection · per-feature toggles
+- **UI/UX** — Home page above/below split with persistent Ask AI · 5 dashboard templates (Executive · Sales · Marketing · Ops · SaaS) · 3 report templates · 5 themes · 4 layout patterns · pagination + auto-aggregation defaults
+- **Embed config UI** (UI only — JWT signing in Phase 2)
+
+**Deferred to Phase 2:**
+
+- Auth + RBAC integration with `ix-copilot/auth-service` and `users-service`
+- License/quota integration with `ix-copilot/license-service`
+- Audit publishing to `ix-copilot/audit-service`
+- Embed JWT signing + row-level access policy enforcement
+- Folder-level ACL implementation
+- Notifications & alerts (in-product + delivery)
+- SSO end-to-end testing
+- Billing / pricing / quota UI inside Arc
+
+**New widget catalog (Phase 1):** 18 chart types + 3 containers — see UX-SPEC §5 for the full list.
+
+---
+
 ## 1. Data Connectivity (15)
 
 - [ ] Postgres connector — P0

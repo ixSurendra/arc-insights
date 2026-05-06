@@ -4,12 +4,14 @@ import {
   ArrowDown,
   ArrowRight,
   ArrowUp,
+  BarChart3,
   Bell,
-  CheckCircle2,
   Clock,
   Database,
   FileText,
+  Layout as LayoutIcon,
   Plus,
+  Sparkles,
   Star,
   TrendingUp,
 } from "lucide-react";
@@ -148,37 +150,6 @@ const ACTIVITY = [
   },
 ];
 
-const DATA_SOURCES = [
-  {
-    name: "warehouse·prod",
-    type: "Postgres",
-    status: "healthy" as const,
-    latency: "23ms",
-    cache: "84%",
-  },
-  {
-    name: "events-stream",
-    type: "Snowflake",
-    status: "healthy" as const,
-    latency: "118ms",
-    cache: "62%",
-  },
-  {
-    name: "billing-replica",
-    type: "Postgres",
-    status: "stale" as const,
-    latency: "—",
-    cache: "—",
-  },
-  {
-    name: "marketing-kpi",
-    type: "BigQuery",
-    status: "healthy" as const,
-    latency: "240ms",
-    cache: "55%",
-  },
-];
-
 const sparkConfig: ChartConfig = {
   type: "line",
   xAxis: "i",
@@ -187,6 +158,10 @@ const sparkConfig: ChartConfig = {
 };
 
 // ─── Page ──────────────────────────────────────────────────────────
+
+const DASHBOARD_COUNT = PINNED_DASHBOARDS.length;
+const SHOW_TEMPLATES = DASHBOARD_COUNT < 3;
+
 export function OverviewPage() {
   return (
     <div
@@ -197,14 +172,51 @@ export function OverviewPage() {
       }}
     >
       <div style={{ maxWidth: 1240, margin: "0 auto" }}>
+        {/* ─── Above the fold ─── */}
         <Welcome />
+        <AskAIInput />
         <PulseStrip />
         <Section
           title="Pinned dashboards"
-          actions={<TextLink to="/dashboard">View all →</TextLink>}
+          actions={<TextLink to="/dashboards">View all →</TextLink>}
         >
           <DashboardGrid />
         </Section>
+        <Section
+          title="AI suggestions for you"
+          actions={
+            <span
+              style={{
+                fontSize: 11,
+                color: "var(--color-fg-subtle)",
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+              }}
+            >
+              Powered by Ollama Cloud
+            </span>
+          }
+        >
+          <SuggestionCards />
+        </Section>
+
+        {/* ─── Below the fold ─── */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "var(--space-5)",
+            marginTop: "var(--space-10)",
+          }}
+        >
+          <Section title="Recent widgets" tight>
+            <RecentWidgetList />
+          </Section>
+          <Section title="Recent reports" tight>
+            <RecentReportList />
+          </Section>
+        </div>
+
         <div
           style={{
             display: "grid",
@@ -220,12 +232,20 @@ export function OverviewPage() {
             <ActivityList />
           </Section>
         </div>
-        <Section
-          title="Data sources"
-          actions={<TextLink to="/data-sources">Manage →</TextLink>}
-        >
-          <DataSourceTable />
-        </Section>
+
+        {SHOW_TEMPLATES && (
+          <Section
+            title="Dashboard templates"
+            actions={
+              <span style={{ fontSize: 11, color: "var(--color-fg-subtle)" }}>
+                Hidden once your workspace has 3+ dashboards · toggle in
+                Settings
+              </span>
+            }
+          >
+            <TemplatesGrid />
+          </Section>
+        )}
       </div>
     </div>
   );
@@ -312,7 +332,7 @@ function Welcome() {
             Connect data
           </SecondaryAction>
           <PrimaryAction iconLeft={<Plus size={14} />}>
-            New notebook
+            New widget
           </PrimaryAction>
         </div>
       </div>
@@ -792,91 +812,9 @@ function ActivityList() {
   );
 }
 
-// ─── Data sources table ─────────────────────────────────────────────
-function DataSourceTable() {
-  return (
-    <div
-      style={{
-        background: "var(--color-bg-elev)",
-        border: "1px solid var(--color-border)",
-        borderRadius: "var(--radius-lg)",
-        overflow: "hidden",
-      }}
-    >
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 120px 120px 120px 120px",
-          gap: "var(--space-4)",
-          padding: "var(--space-3) var(--space-4)",
-          fontSize: 11,
-          fontWeight: 600,
-          letterSpacing: "0.06em",
-          textTransform: "uppercase",
-          color: "var(--color-fg-subtle)",
-          borderBottom: "1px solid var(--color-border)",
-          background: "var(--color-bg-subtle)",
-        }}
-      >
-        <span>Name</span>
-        <span>Type</span>
-        <span>Status</span>
-        <span>Latency</span>
-        <span>Cache hit</span>
-      </div>
-      {DATA_SOURCES.map((s, i) => (
-        <div
-          key={s.name}
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 120px 120px 120px 120px",
-            gap: "var(--space-4)",
-            padding: "var(--space-3) var(--space-4)",
-            fontSize: "var(--text-sm)",
-            color: "var(--color-fg)",
-            alignItems: "center",
-            borderBottom:
-              i === DATA_SOURCES.length - 1
-                ? "none"
-                : "1px solid var(--color-border)",
-          }}
-        >
-          <span
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: 13,
-              color: "var(--color-fg)",
-            }}
-          >
-            {s.name}
-          </span>
-          <span style={{ color: "var(--color-fg-muted)" }}>{s.type}</span>
-          <span>
-            <StatusPill status={s.status} />
-          </span>
-          <span
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: 12,
-              color: "var(--color-fg-muted)",
-            }}
-          >
-            {s.latency}
-          </span>
-          <span
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: 12,
-              color: "var(--color-fg-muted)",
-            }}
-          >
-            {s.cache}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
+// Data sources table moved to its own surface (/data-sources). Removed
+// from the home page in the Phase 1 realignment — home now has Recent
+// widgets / reports / activity / alerts above the templates section.
 
 // ─── Section wrapper ────────────────────────────────────────────────
 function Section({
@@ -949,7 +887,15 @@ function SectionIcon({ title }: { title: string }) {
           ? ActivityIcon
           : title === "Data sources"
             ? Database
-            : FileText;
+            : title === "AI suggestions for you"
+              ? Sparkles
+              : title === "Recent widgets"
+                ? BarChart3
+                : title === "Recent reports"
+                  ? FileText
+                  : title === "Dashboard templates"
+                    ? LayoutIcon
+                    : FileText;
   return (
     <span
       style={{
@@ -998,49 +944,6 @@ function DeltaPill({
     >
       <Icon size={10} />
       {value}
-    </span>
-  );
-}
-
-function StatusPill({ status }: { status: "healthy" | "stale" | "error" }) {
-  const tone =
-    status === "healthy"
-      ? {
-          bg: "rgba(52, 211, 153, 0.14)",
-          fg: "var(--color-success)",
-          icon: CheckCircle2,
-          label: "Healthy",
-        }
-      : status === "stale"
-        ? {
-            bg: "rgba(251, 191, 36, 0.14)",
-            fg: "var(--color-warning)",
-            icon: AlertTriangle,
-            label: "Stale",
-          }
-        : {
-            bg: "rgba(248, 113, 113, 0.14)",
-            fg: "var(--color-danger)",
-            icon: AlertTriangle,
-            label: "Error",
-          };
-  const Icon = tone.icon;
-  return (
-    <span
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 6,
-        padding: "2px 8px",
-        borderRadius: "var(--radius-full)",
-        background: tone.bg,
-        color: tone.fg,
-        fontSize: 11,
-        fontWeight: 600,
-      }}
-    >
-      <Icon size={12} />
-      {tone.label}
     </span>
   );
 }
@@ -1180,4 +1083,458 @@ function formatDate(d: Date): string {
     month: "long",
     day: "numeric",
   });
+}
+
+// ─── Ask AI input (persistent, top of home) ────────────────────────
+function AskAIInput() {
+  const [value, setValue] = useState("");
+  const exemplars = [
+    "Revenue by region last 90 days",
+    "Why did EU sales drop in Q3?",
+    "Top 10 customers by lifetime value",
+  ];
+  return (
+    <div
+      style={{
+        marginBottom: "var(--space-10)",
+        animation: "arc-fade-up 600ms 80ms var(--ease) both",
+      }}
+    >
+      <form
+        role="search"
+        onSubmit={(e) => e.preventDefault()}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "var(--space-3)",
+          padding: "var(--space-3) var(--space-4)",
+          background: "var(--color-bg-elev)",
+          border: "1px solid var(--color-border)",
+          borderRadius: "var(--radius-lg)",
+          boxShadow: "var(--shadow-sm)",
+        }}
+      >
+        <Sparkles size={16} style={{ color: "var(--color-primary)" }} />
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder="Ask AI a question about your data — e.g. revenue by region last 90 days"
+          aria-label="Ask AI"
+          style={{
+            flex: 1,
+            border: "none",
+            background: "transparent",
+            outline: "none",
+            fontSize: "var(--text-md)",
+            color: "var(--color-fg)",
+            fontFamily: "inherit",
+            minWidth: 0,
+          }}
+        />
+        <kbd
+          style={{
+            fontSize: 10,
+            fontFamily: "var(--font-mono)",
+            color: "var(--color-fg-subtle)",
+            padding: "2px 6px",
+            border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-sm)",
+          }}
+        >
+          ⌘K
+        </kbd>
+      </form>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "var(--space-3)",
+          marginTop: "var(--space-2)",
+          flexWrap: "wrap",
+          fontSize: 11,
+          color: "var(--color-fg-subtle)",
+        }}
+      >
+        <span style={{ letterSpacing: "0.04em", textTransform: "uppercase" }}>
+          Try
+        </span>
+        {exemplars.map((q) => (
+          <button
+            key={q}
+            type="button"
+            onClick={() => setValue(q)}
+            style={{
+              border: "1px dashed var(--color-border)",
+              background: "transparent",
+              padding: "2px 8px",
+              borderRadius: "var(--radius-full)",
+              color: "var(--color-fg-muted)",
+              fontFamily: "inherit",
+              fontSize: 11,
+              cursor: "pointer",
+            }}
+          >
+            {q}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── AI suggestion cards (passive, schema-aware) ───────────────────
+const SUGGESTIONS = [
+  {
+    id: "rev-by-region",
+    title: "Revenue by region",
+    blurb:
+      "Your `orders` table has `country` and `amount` — looks like a natural choropleth.",
+    cta: "Build the widget",
+    icon: BarChart3,
+  },
+  {
+    id: "weekly-orders",
+    title: "Weekly orders trend",
+    blurb:
+      "`orders.created_at` is a date column. Group by week to spot seasonality.",
+    cta: "Open in builder",
+    icon: TrendingUp,
+  },
+  {
+    id: "top-products",
+    title: "Top products by revenue",
+    blurb:
+      "We see `products` joined to `orders` — top-N table is one click away.",
+    cta: "Generate widget",
+    icon: Star,
+  },
+];
+
+function SuggestionCards() {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+        gap: "var(--space-4)",
+      }}
+    >
+      {SUGGESTIONS.map((s) => (
+        <Link
+          key={s.id}
+          to="/widgets/new"
+          className="arc-card-lift"
+          style={{
+            background: "var(--color-bg-elev)",
+            border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-lg)",
+            padding: "var(--space-4)",
+            textDecoration: "none",
+            color: "inherit",
+            display: "flex",
+            flexDirection: "column",
+            gap: "var(--space-3)",
+          }}
+        >
+          <span
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: "var(--radius-md)",
+              background:
+                "linear-gradient(135deg, rgba(34, 211, 238, 0.16), rgba(56, 189, 248, 0.10))",
+              color: "var(--color-primary)",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <s.icon size={16} />
+          </span>
+          <div
+            style={{
+              fontSize: "var(--text-sm)",
+              fontWeight: 600,
+              color: "var(--color-fg)",
+            }}
+          >
+            {s.title}
+          </div>
+          <div
+            style={{
+              fontSize: 12,
+              color: "var(--color-fg-muted)",
+              lineHeight: "var(--leading-snug)",
+            }}
+          >
+            {s.blurb}
+          </div>
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: "var(--color-primary)",
+              marginTop: "auto",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+            }}
+          >
+            {s.cta}
+            <ArrowRight size={11} />
+          </span>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+// ─── Recent widgets / reports ──────────────────────────────────────
+const RECENT_WIDGETS = [
+  {
+    id: "rev-region",
+    title: "Revenue by region",
+    type: "Choropleth",
+    updated: "8m ago",
+    owner: "AM",
+  },
+  {
+    id: "weekly-orders",
+    title: "Weekly orders",
+    type: "Line",
+    updated: "21m ago",
+    owner: "PS",
+  },
+  {
+    id: "top-products",
+    title: "Top products by revenue",
+    type: "Bar",
+    updated: "1h ago",
+    owner: "AM",
+  },
+  {
+    id: "aov",
+    title: "Average order value",
+    type: "KPI card",
+    updated: "2h ago",
+    owner: "RK",
+  },
+];
+
+const RECENT_REPORTS = [
+  {
+    id: "mbr-may",
+    title: "Monthly business review · May",
+    type: "Monthly",
+    updated: "Yesterday",
+    owner: "AM",
+  },
+  {
+    id: "weekly-19",
+    title: "Weekly digest · W19",
+    type: "Weekly",
+    updated: "3 days ago",
+    owner: "PS",
+  },
+  {
+    id: "q1-board",
+    title: "Q1 board pack",
+    type: "Quarterly",
+    updated: "2 weeks ago",
+    owner: "AM",
+  },
+];
+
+function RecentWidgetList() {
+  return (
+    <ul
+      style={{
+        margin: 0,
+        padding: 0,
+        listStyle: "none",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {RECENT_WIDGETS.map((w, i) => (
+        <li
+          key={w.id}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr auto auto",
+            gap: "var(--space-3)",
+            alignItems: "center",
+            padding: "var(--space-3) var(--space-4)",
+            borderBottom:
+              i === RECENT_WIDGETS.length - 1
+                ? "none"
+                : "1px solid var(--color-border)",
+            fontSize: "var(--text-sm)",
+          }}
+        >
+          <span style={{ color: "var(--color-fg)", fontWeight: 500 }}>
+            {w.title}
+          </span>
+          <span
+            style={{
+              fontSize: 11,
+              padding: "2px 6px",
+              background: "var(--color-bg-subtle)",
+              border: "1px solid var(--color-border)",
+              borderRadius: "var(--radius-sm)",
+              color: "var(--color-fg-muted)",
+            }}
+          >
+            {w.type}
+          </span>
+          <span
+            style={{
+              fontSize: 11,
+              fontFamily: "var(--font-mono)",
+              color: "var(--color-fg-subtle)",
+            }}
+          >
+            {w.updated}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function RecentReportList() {
+  return (
+    <ul
+      style={{
+        margin: 0,
+        padding: 0,
+        listStyle: "none",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {RECENT_REPORTS.map((r, i) => (
+        <li
+          key={r.id}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr auto auto",
+            gap: "var(--space-3)",
+            alignItems: "center",
+            padding: "var(--space-3) var(--space-4)",
+            borderBottom:
+              i === RECENT_REPORTS.length - 1
+                ? "none"
+                : "1px solid var(--color-border)",
+            fontSize: "var(--text-sm)",
+          }}
+        >
+          <span style={{ color: "var(--color-fg)", fontWeight: 500 }}>
+            {r.title}
+          </span>
+          <span
+            style={{
+              fontSize: 11,
+              padding: "2px 6px",
+              background: "var(--color-bg-subtle)",
+              border: "1px solid var(--color-border)",
+              borderRadius: "var(--radius-sm)",
+              color: "var(--color-fg-muted)",
+            }}
+          >
+            {r.type}
+          </span>
+          <span
+            style={{
+              fontSize: 11,
+              fontFamily: "var(--font-mono)",
+              color: "var(--color-fg-subtle)",
+            }}
+          >
+            {r.updated}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// ─── Dashboard templates (gated by dashboard count) ────────────────
+const TEMPLATE_PICKS = [
+  {
+    id: "executive",
+    title: "Executive overview",
+    blurb: "4 KPIs · trend · geo · top-N table",
+  },
+  {
+    id: "sales-pipeline",
+    title: "Sales pipeline",
+    blurb: "Funnel · deals by stage · win rate · top reps · forecast",
+  },
+  {
+    id: "marketing",
+    title: "Marketing performance",
+    blurb: "Channel mix · campaigns · conversion funnel · weekly trend",
+  },
+  {
+    id: "ops",
+    title: "Operations / health",
+    blurb: "Uptime · p99 latency · errors · top failures",
+  },
+  {
+    id: "saas",
+    title: "SaaS metrics",
+    blurb: "DAU/MAU · activation funnel · retention cohort · adoption",
+  },
+];
+
+function TemplatesGrid() {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+        gap: "var(--space-3)",
+      }}
+    >
+      {TEMPLATE_PICKS.map((t) => (
+        <Link
+          key={t.id}
+          to={`/dashboards/new?template=${t.id}`}
+          className="arc-card-lift"
+          style={{
+            background: "var(--color-bg-elev)",
+            border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-lg)",
+            padding: "var(--space-4)",
+            textDecoration: "none",
+            color: "inherit",
+            display: "flex",
+            flexDirection: "column",
+            gap: "var(--space-2)",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "var(--text-sm)",
+              fontWeight: 600,
+              color: "var(--color-fg)",
+            }}
+          >
+            {t.title}
+          </div>
+          <div
+            style={{
+              fontSize: 12,
+              color: "var(--color-fg-muted)",
+              lineHeight: "var(--leading-snug)",
+            }}
+          >
+            {t.blurb}
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
 }

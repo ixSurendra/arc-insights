@@ -2,7 +2,37 @@
 
 Where AI is used in Arc Insights, what data flows where, and how it works in air-gapped mode.
 
-**Architecture in one line:** All AI features go through ONE swappable endpoint. Cloud customers point at OpenAI / Anthropic / Azure OpenAI. Air-gapped customers point at Ollama. Same code path, one env var.
+**Architecture in one line:** All AI features go through ONE swappable endpoint. Cloud customers point at OpenAI / Anthropic / Azure OpenAI / Ollama Cloud. Air-gapped customers point at local Ollama. Same code path, one env var.
+
+**Phase 1 default provider:** Ollama Cloud (`https://ollama.com`). Read from `backend/.env.local` via `ARC_LLM_*` env vars. Per-tenant provider configuration in Settings → AI lands in Phase 2.
+
+## Phase 1 surfaces (locked)
+
+The following AI surfaces ship in Phase 1. Behavior contracts below apply to every one.
+
+| Surface                                 | Mode                                             |
+| --------------------------------------- | ------------------------------------------------ |
+| Ask AI on Home                          | Conversational, persistent thread, streamed      |
+| Ask AI in widget builder                | Conversational, scoped to the current widget     |
+| Explain this widget                     | One-shot, streamed, cites tables/columns/metrics |
+| Anomaly callouts on widgets             | One-shot, evaluated on render or schedule        |
+| Auto-summary on reports                 | One-shot, on by default at top, dismissible      |
+| Per-section commentary in reports       | One-shot, on demand                              |
+| Auto-name (widget / dashboard / report) | One-shot                                         |
+| Suggested dashboard arrangements        | One-shot, runs over tenant's existing widgets    |
+| Schema-scan narration on connect        | Streamed, runs once per connect                  |
+| Smart-fill template field mapping       | One-shot, tenant confirms before generation      |
+
+### Behavior contracts (binding)
+
+1. **Streaming with visible reasoning** — collapsible "thinking" disclosure on every conversational surface
+2. **Act with confirmation on writes** — read queries run freely; saving widgets, editing the Data Model, or modifying RBAC asks once before applying
+3. **Never edit Data Model or RBAC autonomously** — must always be a tenant-driven action
+4. **Per-user persistent history** — Ask AI threads saved per user with shareable thread links
+5. **Never fake an answer** — low-confidence or out-of-scope → say so explicitly and offer an alternative
+6. **Always cite the work** — every AI-returned widget shows tables, joins, filters, metrics used
+7. **BYO-LLM capability negotiation** — capability detection at provider connect; downgrade UI affordances when the model can't reliably do tool use, structured output, or long context
+8. **Per-feature toggles** — tenants can disable individual AI features (e.g. turn off auto-summary if the local model writes weak prose)
 
 ## Privacy guarantees (binding)
 
@@ -92,17 +122,17 @@ Where AI is used in Arc Insights, what data flows where, and how it works in air
 
 ## Architecture components
 
-| Component                   | Tech                                                                             | Purpose                                                                                                       |
-| --------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| **LLM endpoint (BYO)**      | OpenAI / Anthropic / Azure OpenAI / Ollama / vLLM                                | Single OpenAI-compatible interface; customer picks the backend.                                               |
-| **Orchestration**           | Vercel AI SDK                                                                    | TypeScript-first. Streaming, structured output, tool calls. Don't use LangChain — too heavy for narrow needs. |
-| **Embeddings**              | OpenAI text-embedding-3-small (cloud) / nomic-embed-text via Ollama (air-gapped) | For semantic search and RAG grounding.                                                                        |
-| **Vector store**            | pgvector inside metadata Postgres                                                | No new service. Stores embeddings of schemas, metric definitions, dashboard contents, docs.                   |
-| **Prompt grounding (RAG)**  | Custom retriever                                                                 | Before calling the LLM, fetch only the relevant slice of semantic layer + product docs.                       |
-| **Output validation**       | Zod schemas on every LLM response                                                | LLM outputs must match a schema (SQL must parse, chart configs must validate). Reject and retry on failure.   |
-| **Caching**                 | Valkey                                                                           | Cache LLM responses by (prompt + context-hash). Save cost + latency on repeated questions.                    |
-| **Rate limiting / budgets** | Per-tenant LLM token + cost caps                                                 | Stops one tenant from running up the OpenAI bill. Configurable by admin.                                      |
-| **Observability**           | OpenTelemetry spans for every LLM call                                           | Track tokens, latency, cost, success rate per surface.                                                        |
+| Component                   | Tech                                                                                     | Purpose                                                                                                                                                          |
+| --------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **LLM endpoint (BYO)**      | Ollama Cloud (Phase 1 default) / OpenAI / Anthropic / Azure OpenAI / Ollama local / vLLM | Single OpenAI-compatible interface; customer picks the backend. Phase 1 hardcodes via `ARC_LLM_*` env vars; Phase 2 surfaces per-tenant config in Settings → AI. |
+| **Orchestration**           | Vercel AI SDK                                                                            | TypeScript-first. Streaming, structured output, tool calls. Don't use LangChain — too heavy for narrow needs.                                                    |
+| **Embeddings**              | OpenAI text-embedding-3-small (cloud) / nomic-embed-text via Ollama (air-gapped)         | For semantic search and RAG grounding.                                                                                                                           |
+| **Vector store**            | pgvector inside metadata Postgres                                                        | No new service. Stores embeddings of schemas, metric definitions, dashboard contents, docs.                                                                      |
+| **Prompt grounding (RAG)**  | Custom retriever                                                                         | Before calling the LLM, fetch only the relevant slice of semantic layer + product docs.                                                                          |
+| **Output validation**       | Zod schemas on every LLM response                                                        | LLM outputs must match a schema (SQL must parse, chart configs must validate). Reject and retry on failure.                                                      |
+| **Caching**                 | Valkey                                                                                   | Cache LLM responses by (prompt + context-hash). Save cost + latency on repeated questions.                                                                       |
+| **Rate limiting / budgets** | Per-tenant LLM token + cost caps                                                         | Stops one tenant from running up the OpenAI bill. Configurable by admin.                                                                                         |
+| **Observability**           | OpenTelemetry spans for every LLM call                                                   | Track tokens, latency, cost, success rate per surface.                                                                                                           |
 
 ---
 

@@ -9,6 +9,24 @@ Live status of every task in the build plan. Update as you work.
 
 ---
 
+## 🚧 Phase 1 realigned — 2026-05-06
+
+The product was pivoted from a notebook-canvas direction (Hex-style) to a Metabase-style dashboard-first BI tool after a focused design discussion with the user. Task list expanded from 15 to ~50 in Phase 1 to cover Data Model, widget builder, dashboard grid, reports, AI surfaces, templates, and embed config UI. Auth/RBAC/billing/audit/embed-JWT moved to Phase 2 (foundation integration with `ix-copilot` at `~/Desktop/DMS_foundational_layer/ix-copilot`).
+
+**Notebook code superseded** — the following files are dead code and slated for removal in the next commit:
+
+- `frontend/src/notebook/Cell.tsx`
+- `frontend/src/notebook/CellBodies.tsx`
+- `frontend/src/notebook/Notebook.tsx`
+- `frontend/src/notebook/sample-notebook.ts`
+- `frontend/src/notebook/types.ts`
+- `frontend/src/pages/Dashboard.tsx` (the NotebookView wrapper — to be replaced by a dashboard grid)
+- `frontend/e2e/dashboard.spec.ts` notebook-cell assertions
+
+See [ROADMAP.md](ROADMAP.md) for the full realigned task list and [UX-SPEC.md](UX-SPEC.md) for binding behavior contracts.
+
+---
+
 ## Phase Overview
 
 | Phase                            | Window      | Done | Total | Status      |
