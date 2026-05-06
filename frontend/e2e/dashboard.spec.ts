@@ -1,32 +1,30 @@
 import { test, expect } from "@playwright/test";
 
 /**
- * P1-09 — dashboard renders four chart cards and the global filter bar
- * mutates every chart's data when filters are added or removed.
+ * Dashboard now renders as a notebook (Hex-style). Verify the title,
+ * a few of the cell types render, and Run all flips the status badge.
  */
-test("dashboard: 4 chart cards render with the sample dashboard", async ({
-  page,
-}) => {
+test("notebook page renders cells with the new design", async ({ page }) => {
   await page.goto("/dashboard");
 
   await expect(
     page.getByRole("heading", { name: "Sales overview" }),
-  ).toBeVisible({ timeout: 10_000 });
+  ).toBeVisible({
+    timeout: 10_000,
+  });
 
-  for (const id of [
-    "dashboard-chart-revenue-by-month",
-    "dashboard-chart-total-revenue",
-    "dashboard-chart-revenue-by-region",
-    "dashboard-chart-share-by-region",
-  ]) {
-    await expect(page.getByTestId(id)).toBeVisible();
-  }
+  // The headline big-number cell.
+  await expect(page.getByText("$405k")).toBeVisible();
 
-  // The default global filter (status = completed) is set; clearing it
-  // should leave the dashboard intact (charts may show different values
-  // but should still render).
-  await page.getByRole("button", { name: /Clear all/ }).click();
-  await expect(
-    page.getByTestId("dashboard-chart-revenue-by-month"),
-  ).toBeVisible();
+  // A SQL cell — keyword highlighting won't matter to the test, but the
+  // SQL content should be present.
+  await expect(page.getByText(/Monthly revenue by region/)).toBeVisible();
+
+  // A chart cell (line/area). ECharts paints a canvas inside any chart
+  // cell — at least one canvas should be visible.
+  await expect(page.locator("canvas").first()).toBeVisible({ timeout: 5_000 });
+
+  // Run all flips the status badge to "Running…" briefly.
+  await page.getByRole("button", { name: /Run all/ }).click();
+  await expect(page.getByText(/Running/)).toBeVisible({ timeout: 2_000 });
 });
