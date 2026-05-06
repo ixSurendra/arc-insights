@@ -1,268 +1,365 @@
 import {
+  ActivityIcon,
+  AlertTriangle,
+  ArrowDown,
   ArrowRight,
+  ArrowUp,
+  Bell,
+  CheckCircle2,
+  Clock,
   Database,
-  Github,
-  KeyRound,
-  Layers,
-  Lock,
-  Play,
-  Sparkles,
-  TerminalSquare,
-  Wallet,
+  FileText,
+  Plus,
+  Star,
+  TrendingUp,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { createArcInsights } from "@arc-insights/sdk";
+import { Link } from "react-router-dom";
 import { Chart } from "../charts/Chart";
-import { RichBigNumber } from "../charts/RichBigNumber";
-import type { ChartConfig, ChartData } from "../charts/types";
+import type { ChartConfig } from "../charts/types";
 
-const client = createArcInsights();
+// ─── Sample data (replaced by API in P1-10 / P1-12) ────────────────
+const PINNED_DASHBOARDS = [
+  {
+    id: "sales-overview",
+    title: "Sales overview",
+    folder: "Finance",
+    owner: "Aman M.",
+    updated: "12s ago",
+    href: "/dashboard",
+    accent: "var(--color-primary)",
+    spark: [120, 135, 148, 162, 178, 195, 215, 240],
+  },
+  {
+    id: "growth-funnel",
+    title: "Growth funnel · self-serve",
+    folder: "Growth",
+    owner: "Priya S.",
+    updated: "4m ago",
+    href: "/dashboard",
+    accent: "var(--color-accent)",
+    spark: [90, 88, 102, 110, 118, 130, 142, 158],
+  },
+  {
+    id: "infra-health",
+    title: "Infra · p99 latency",
+    folder: "Engineering",
+    owner: "Ravi K.",
+    updated: "1h ago",
+    href: "/dashboard",
+    accent: "var(--color-cell-chart)",
+    spark: [820, 815, 838, 842, 836, 830, 822, 818],
+  },
+  {
+    id: "tenant-usage",
+    title: "Tenant usage rollup",
+    folder: "Embed",
+    owner: "Aman M.",
+    updated: "3h ago",
+    href: "/dashboard",
+    accent: "var(--color-success)",
+    spark: [40, 55, 60, 75, 78, 82, 90, 96],
+  },
+];
 
-const sampleSeries: ChartData = {
-  rows: [
-    { month: "Jan", NA: 18000, EU: 12000, APAC: 6000 },
-    { month: "Feb", NA: 22000, EU: 15000, APAC: 7500 },
-    { month: "Mar", NA: 24000, EU: 17500, APAC: 9000 },
-    { month: "Apr", NA: 27000, EU: 16000, APAC: 9500 },
-    { month: "May", NA: 30000, EU: 21000, APAC: 11000 },
-    { month: "Jun", NA: 35000, EU: 24000, APAC: 13000 },
-  ],
-};
+const ALERTS = [
+  {
+    id: 1,
+    severity: "danger" as const,
+    title: "Snowflake spend approaching budget",
+    body: "Q3 budget at 82% with 14 days remaining.",
+    time: "8 min ago",
+  },
+  {
+    id: 2,
+    severity: "warn" as const,
+    title: "EU revenue dropped 11% WoW",
+    body: "Anomaly detected on `Sales overview`.",
+    time: "1 hr ago",
+  },
+  {
+    id: 3,
+    severity: "warn" as const,
+    title: "Slow query · 14.2s",
+    body: "`growth-funnel.daily_active` exceeded soft cap.",
+    time: "3 hr ago",
+  },
+];
 
-const heroChartConfig: ChartConfig = {
+const ACTIVITY = [
+  {
+    id: 1,
+    who: "PS",
+    action: "edited",
+    target: "Growth funnel · self-serve",
+    time: "4m",
+  },
+  {
+    id: 2,
+    who: "RK",
+    action: "ran",
+    target: "infra · p99_latency.sql",
+    time: "12m",
+  },
+  {
+    id: 3,
+    who: "AM",
+    action: "shared",
+    target: "Sales overview with Acme · prod",
+    time: "27m",
+  },
+  {
+    id: 4,
+    who: "PS",
+    action: "created notebook",
+    target: "Q3 retention probe",
+    time: "1h",
+  },
+  {
+    id: 5,
+    who: "system",
+    action: "auto-refreshed",
+    target: "Tenant usage rollup",
+    time: "1h",
+  },
+];
+
+const DATA_SOURCES = [
+  {
+    name: "warehouse·prod",
+    type: "Postgres",
+    status: "healthy" as const,
+    latency: "23ms",
+    cache: "84%",
+  },
+  {
+    name: "events-stream",
+    type: "Snowflake",
+    status: "healthy" as const,
+    latency: "118ms",
+    cache: "62%",
+  },
+  {
+    name: "billing-replica",
+    type: "Postgres",
+    status: "stale" as const,
+    latency: "—",
+    cache: "—",
+  },
+  {
+    name: "marketing-kpi",
+    type: "BigQuery",
+    status: "healthy" as const,
+    latency: "240ms",
+    cache: "55%",
+  },
+];
+
+const sparkConfig: ChartConfig = {
   type: "line",
-  xAxis: "month",
-  yAxes: ["NA", "EU", "APAC"],
+  xAxis: "i",
+  yAxes: ["v"],
   area: true,
-  valueFormat: "currency",
-  currency: "USD",
 };
 
+// ─── Page ──────────────────────────────────────────────────────────
 export function OverviewPage() {
   return (
-    <div style={{ overflow: "hidden" }}>
-      <Hero />
-      <Marquee />
-      <FeatureSection
-        eyebrow="Embed-first"
-        title="Drop dashboards into your customer's product."
-        body="Signed-JWT iframes plus React, Vue, and vanilla SDKs. White-label via CSS custom properties — your customers brand it without a recompile."
-        icon={Layers}
-        side="right"
-      >
-        <EmbedPreviewCard />
-      </FeatureSection>
-      <FeatureSection
-        eyebrow="On-prem · Air-gapped"
-        title="Yours from day one. Including the air-gapped ones."
-        body="Single distroless binary. Helm chart with HA. License-key activation that works offline. BYOK across AWS / Azure / GCP / Vault. No phoning home."
-        icon={Lock}
-        side="left"
-      >
-        <TerminalPreviewCard />
-      </FeatureSection>
-      <FeatureSection
-        eyebrow="Cost transparency"
-        title="Know what every chart costs to run."
-        body="Per-query dollar estimates on Snowflake and BigQuery. Per-tenant budgets. Soft warnings at 80%, hard cap at 100%. Auto-pause runaway queries before they blow up your bill."
-        icon={Wallet}
-        side="right"
-      >
-        <CostPreviewCard />
-      </FeatureSection>
-      <StatStrip />
-      <BigCTA />
-      <FooterStrip />
+    <div
+      className="arc-bg-textured arc-bg-noise-layer"
+      style={{
+        minHeight: "100%",
+        padding: "var(--space-8) var(--space-6) var(--space-16)",
+      }}
+    >
+      <div style={{ maxWidth: 1240, margin: "0 auto" }}>
+        <Welcome />
+        <PulseStrip />
+        <Section
+          title="Pinned dashboards"
+          actions={<TextLink to="/dashboard">View all →</TextLink>}
+        >
+          <DashboardGrid />
+        </Section>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "var(--space-5)",
+            marginTop: "var(--space-8)",
+          }}
+        >
+          <Section title="Alerts needing attention" tight>
+            <AlertList />
+          </Section>
+          <Section title="Recent activity" tight>
+            <ActivityList />
+          </Section>
+        </div>
+        <Section
+          title="Data sources"
+          actions={<TextLink to="/data-sources">Manage →</TextLink>}
+        >
+          <DataSourceTable />
+        </Section>
+      </div>
     </div>
   );
 }
 
-// ─── Hero ──────────────────────────────────────────────────────────
-function Hero() {
-  return (
-    <section
-      style={{
-        position: "relative",
-        padding: "var(--space-20) var(--space-6) var(--space-12)",
-        background: "var(--gradient-hero)",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: 1080,
-          margin: "0 auto",
-          textAlign: "center",
-          animation: "arc-fade-up 600ms var(--ease) both",
-        }}
-      >
-        <Eyebrow>
-          <span
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: "50%",
-              background: "var(--color-primary)",
-              display: "inline-block",
-              boxShadow: "0 0 12px var(--color-primary)",
-            }}
-          />
-          Open source · Self-hostable · AGPLv3
-        </Eyebrow>
-        <h1
-          style={{
-            margin: "var(--space-4) auto 0",
-            fontSize: "clamp(40px, 6vw, var(--text-5xl))",
-            fontWeight: 700,
-            letterSpacing: "-0.03em",
-            lineHeight: "var(--leading-tight)",
-            maxWidth: 920,
-            background:
-              "linear-gradient(180deg, var(--color-fg) 0%, var(--color-fg-muted) 130%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-          }}
-        >
-          The analytics platform that{" "}
-          <span
-            style={{
-              background:
-                "linear-gradient(90deg, var(--color-primary), var(--color-accent))",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            ships with you
-          </span>
-          .
-        </h1>
-        <p
-          style={{
-            margin: "var(--space-5) auto 0",
-            fontSize: "clamp(16px, 2vw, 18px)",
-            color: "var(--color-fg-muted)",
-            maxWidth: 660,
-            lineHeight: "var(--leading-relaxed)",
-          }}
-        >
-          Connect a database, build dashboards visually or with SQL, embed them
-          anywhere — including on-prem and air-gapped customers nobody else can
-          reach.
-        </p>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "var(--space-3)",
-            marginTop: "var(--space-8)",
-            flexWrap: "wrap",
-          }}
-        >
-          <CTAButton primary iconLeft={<Play size={16} />}>
-            Get started — make dev
-          </CTAButton>
-          <CTAButton iconLeft={<Github size={16} />}>View on GitHub</CTAButton>
-        </div>
-      </div>
-
-      {/* Floating product preview */}
-      <ProductPreview />
-    </section>
-  );
-}
-
-function ProductPreview() {
-  const [health, setHealth] = useState<string>("connecting…");
-
+// ─── Welcome row ───────────────────────────────────────────────────
+function Welcome() {
+  const [now, setNow] = useState(formatDate(new Date()));
   useEffect(() => {
-    void client.health
-      .get()
-      .then(({ data }) => {
-        if (data?.status === "ok")
-          setHealth(`${data.service} · ${data.version}`);
-      })
-      .catch(() => setHealth("offline"));
+    const t = setInterval(() => setNow(formatDate(new Date())), 60_000);
+    return () => clearInterval(t);
   }, []);
 
   return (
-    <div
+    <header
       style={{
-        maxWidth: 1080,
-        margin: "var(--space-12) auto 0",
-        padding: "0 var(--space-3)",
-        animation: "arc-fade-up 800ms 200ms var(--ease) both",
+        marginBottom: "var(--space-8)",
+        animation: "arc-fade-up 500ms var(--ease) both",
       }}
     >
       <div
         style={{
-          background: "var(--color-bg-elev)",
-          border: "1px solid var(--color-border)",
-          borderRadius: "var(--radius-2xl)",
-          boxShadow: "var(--shadow-xl)",
-          padding: "var(--space-2)",
-          position: "relative",
-          overflow: "hidden",
+          display: "flex",
+          alignItems: "center",
+          gap: "var(--space-3)",
+          fontSize: 12,
+          fontWeight: 600,
+          letterSpacing: "0.06em",
+          textTransform: "uppercase",
+          color: "var(--color-fg-subtle)",
+          marginBottom: "var(--space-3)",
         }}
       >
-        {/* Window-frame title row */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "var(--space-2) var(--space-4)",
-            color: "var(--color-fg-subtle)",
-            fontSize: 12,
-            fontFamily: "var(--font-mono)",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <Clock size={12} />
+        {now}
+      </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-end",
+          justifyContent: "space-between",
+          gap: "var(--space-6)",
+          flexWrap: "wrap",
+        }}
+      >
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: "clamp(28px, 4vw, var(--text-3xl))",
+              fontWeight: 700,
+              letterSpacing: "-0.025em",
+              lineHeight: "var(--leading-tight)",
+            }}
+          >
+            Good morning,{" "}
             <span
               style={{
-                width: 10,
-                height: 10,
-                borderRadius: "50%",
-                background: "#ff5f57",
+                background:
+                  "linear-gradient(90deg, var(--color-primary), var(--color-accent))",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
               }}
-            />
-            <span
-              style={{
-                width: 10,
-                height: 10,
-                borderRadius: "50%",
-                background: "#febc2e",
-              }}
-            />
-            <span
-              style={{
-                width: 10,
-                height: 10,
-                borderRadius: "50%",
-                background: "#28c840",
-              }}
-            />
-          </div>
-          <span>arc-insights · {health}</span>
-          <span aria-hidden style={{ width: 36 }} />
+            >
+              Aman
+            </span>
+            .
+          </h1>
+          <p
+            style={{
+              margin: "var(--space-2) 0 0",
+              color: "var(--color-fg-muted)",
+              fontSize: "var(--text-md)",
+              maxWidth: 600,
+            }}
+          >
+            Here&apos;s your data today — three alerts, four pinned dashboards,
+            and spend running 12% under budget.
+          </p>
         </div>
-        {/* Inner canvas */}
+        <div style={{ display: "flex", gap: "var(--space-2)" }}>
+          <SecondaryAction iconLeft={<Database size={14} />}>
+            Connect data
+          </SecondaryAction>
+          <PrimaryAction iconLeft={<Plus size={14} />}>
+            New notebook
+          </PrimaryAction>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+// ─── Pulse strip ───────────────────────────────────────────────────
+function PulseStrip() {
+  const stats = [
+    {
+      label: "Queries today",
+      value: "1,284",
+      delta: "+18%",
+      dir: "up" as const,
+      hint: "vs yesterday",
+    },
+    {
+      label: "Spend · MTD",
+      value: "$284",
+      delta: "82%",
+      dir: "flat" as const,
+      hint: "of $350 budget",
+    },
+    {
+      label: "p99 latency",
+      value: "838ms",
+      delta: "−4%",
+      dir: "down" as const,
+      hint: "within budget",
+    },
+    {
+      label: "Cache hit rate",
+      value: "84%",
+      delta: "+2pp",
+      dir: "up" as const,
+      hint: "steady",
+    },
+  ];
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+        gap: "var(--space-4)",
+        marginBottom: "var(--space-10)",
+      }}
+    >
+      {stats.map((s) => (
         <div
+          key={s.label}
           style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 320px",
-            gap: 0,
-            background: "var(--color-bg)",
-            borderRadius: "var(--radius-xl)",
+            position: "relative",
+            background: "var(--color-bg-elev)",
             border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-lg)",
+            padding: "var(--space-5)",
+            overflow: "hidden",
           }}
         >
           <div
+            aria-hidden
             style={{
-              padding: "var(--space-5) var(--space-5) var(--space-3)",
-              borderRight: "1px solid var(--color-border)",
+              position: "absolute",
+              inset: 0,
+              background: "var(--pattern-dots)",
+              opacity: 0.5,
+              pointerEvents: "none",
             }}
-          >
+          />
+          <div style={{ position: "relative" }}>
             <div
               style={{
                 fontSize: 11,
@@ -273,388 +370,350 @@ function ProductPreview() {
                 marginBottom: "var(--space-2)",
               }}
             >
-              Revenue · last 6 months
+              {s.label}
             </div>
-            <div style={{ height: 280 }}>
-              <Chart
-                config={heroChartConfig}
-                data={sampleSeries}
-                height={280}
-              />
-            </div>
-          </div>
-          <div style={{ padding: "var(--space-5)" }}>
-            <RichBigNumber
-              eyebrow="Q2 to date"
-              label="Total revenue"
-              value="$405k"
-              delta="+14.2%"
-              deltaDirection="up"
-              deltaSuffix="vs prior"
-              sparkline={[120, 135, 148, 162, 178, 195, 215, 240]}
-              subStats={[
-                { label: "Avg / mo", value: "$67.5k" },
-                { label: "Best", value: "$84.2k" },
-              ]}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Marquee ───────────────────────────────────────────────────────
-function Marquee() {
-  const items = [
-    "Postgres",
-    "MySQL",
-    "BigQuery",
-    "Snowflake",
-    "Redshift",
-    "DuckDB",
-    "ClickHouse",
-    "Databricks",
-    "S3 / Parquet",
-    "Google Sheets",
-    "REST",
-    "MongoDB",
-  ];
-  // double for seamless loop
-  const track = [...items, ...items];
-  return (
-    <section
-      aria-label="Supported data sources"
-      style={{
-        padding: "var(--space-12) 0",
-        borderTop: "1px solid var(--color-border)",
-        borderBottom: "1px solid var(--color-border)",
-        background: "var(--color-bg)",
-      }}
-    >
-      <div
-        style={{
-          textAlign: "center",
-          fontSize: 11,
-          fontWeight: 600,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: "var(--color-fg-subtle)",
-          marginBottom: "var(--space-6)",
-        }}
-      >
-        Connects to everything you already use
-      </div>
-      <div
-        style={{
-          maskImage:
-            "linear-gradient(90deg, transparent, black 12%, black 88%, transparent)",
-          WebkitMaskImage:
-            "linear-gradient(90deg, transparent, black 12%, black 88%, transparent)",
-          overflow: "hidden",
-        }}
-      >
-        <ul
-          className="arc-marquee"
-          style={{
-            margin: 0,
-            padding: 0,
-            listStyle: "none",
-            color: "var(--color-fg-muted)",
-            fontSize: "var(--text-md)",
-            fontWeight: 500,
-            letterSpacing: "-0.01em",
-          }}
-        >
-          {track.map((item, i) => (
-            <li
-              key={i}
+            <div
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "var(--space-2)",
+                fontSize: "clamp(24px, 2.6vw, var(--text-2xl))",
+                fontWeight: 700,
+                letterSpacing: "-0.02em",
+                color: "var(--color-fg)",
               }}
             >
-              <Database size={14} style={{ color: "var(--color-fg-subtle)" }} />
-              {item}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
+              {s.value}
+            </div>
+            <div
+              style={{
+                marginTop: "var(--space-2)",
+                display: "flex",
+                alignItems: "center",
+                gap: "var(--space-2)",
+                fontSize: 12,
+              }}
+            >
+              <DeltaPill direction={s.dir} value={s.delta} />
+              <span style={{ color: "var(--color-fg-subtle)" }}>{s.hint}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
 
-// ─── Feature section (alternating left/right) ──────────────────────
-function FeatureSection({
-  eyebrow,
-  title,
-  body,
-  icon: Icon,
-  side,
-  children,
-}: {
-  eyebrow: string;
-  title: string;
-  body: string;
-  icon: typeof Layers;
-  side: "left" | "right";
-  children: React.ReactNode;
-}) {
+// ─── Pinned dashboards ─────────────────────────────────────────────
+function DashboardGrid() {
   return (
-    <section
+    <div
       style={{
-        padding: "var(--space-20) var(--space-6)",
-        borderBottom: "1px solid var(--color-border)",
+        display: "grid",
+        gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+        gap: "var(--space-4)",
       }}
     >
-      <div
-        style={{
-          maxWidth: 1080,
-          margin: "0 auto",
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "var(--space-12)",
-          alignItems: "center",
-        }}
-      >
-        <div
+      {PINNED_DASHBOARDS.map((d) => (
+        <Link
+          key={d.id}
+          to={d.href}
           style={{
-            order: side === "left" ? 1 : 2,
+            background: "var(--color-bg-elev)",
+            border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-lg)",
+            padding: "var(--space-4)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "var(--space-3)",
+            color: "inherit",
+            textDecoration: "none",
+            transition:
+              "border-color var(--motion-fast) var(--ease), transform var(--motion-fast) var(--ease)",
+            position: "relative",
+            overflow: "hidden",
           }}
         >
-          <Eyebrow>
-            <Icon size={12} />
-            {eyebrow}
-          </Eyebrow>
-          <h2
+          <div
+            aria-hidden
             style={{
-              margin: "var(--space-3) 0 0",
-              fontSize: "clamp(28px, 4vw, var(--text-3xl))",
-              fontWeight: 700,
-              letterSpacing: "-0.02em",
-              lineHeight: "var(--leading-tight)",
-              color: "var(--color-fg)",
-              maxWidth: 480,
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 2,
+              background: `linear-gradient(90deg, ${d.accent}, transparent)`,
+            }}
+          />
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "var(--space-2)",
             }}
           >
-            {title}
-          </h2>
-          <p
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: d.accent,
+              }}
+            >
+              {d.folder}
+            </span>
+            <Star size={12} fill={d.accent} stroke={d.accent} />
+          </div>
+          <div
             style={{
-              margin: "var(--space-4) 0 0",
               fontSize: "var(--text-md)",
-              color: "var(--color-fg-muted)",
-              lineHeight: "var(--leading-relaxed)",
-              maxWidth: 480,
+              fontWeight: 600,
+              color: "var(--color-fg)",
+              lineHeight: "var(--leading-tight)",
             }}
           >
-            {body}
-          </p>
-        </div>
-        <div style={{ order: side === "left" ? 2 : 1, minWidth: 0 }}>
-          {children}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── Per-feature visuals ───────────────────────────────────────────
-function EmbedPreviewCard() {
-  return (
-    <div
-      style={{
-        background: "var(--color-bg-elev)",
-        border: "1px solid var(--color-border)",
-        borderRadius: "var(--radius-xl)",
-        padding: "var(--space-5)",
-        boxShadow: "var(--shadow-md)",
-      }}
-    >
-      <div
-        style={{
-          fontSize: 11,
-          fontFamily: "var(--font-mono)",
-          color: "var(--color-fg-subtle)",
-          marginBottom: "var(--space-3)",
-        }}
-      >
-        {"// your-app.tsx"}
-      </div>
-      <pre
-        style={{
-          margin: 0,
-          fontSize: 12,
-          fontFamily: "var(--font-mono)",
-          background: "var(--color-bg)",
-          border: "1px solid var(--color-border)",
-          borderRadius: "var(--radius-md)",
-          padding: "var(--space-4)",
-          color: "var(--color-fg)",
-          overflowX: "auto",
-        }}
-      >
-        <code>
-          <span style={{ color: "var(--color-cell-sql)" }}>import</span>
-          {" { "}Dashboard{" } "}
-          <span style={{ color: "var(--color-cell-sql)" }}>from</span>{" "}
-          <span style={{ color: "var(--color-cell-markdown)" }}>
-            {`'@arc-insights/sdk'`}
-          </span>
-          ;{"\n\n"}
-          {"<"}
-          <span style={{ color: "var(--color-primary)" }}>Dashboard</span>{" "}
-          <span style={{ color: "var(--color-cell-chart)" }}>id</span>=
-          <span
-            style={{ color: "var(--color-cell-markdown)" }}
-          >{`"sales"`}</span>{" "}
-          <span style={{ color: "var(--color-cell-chart)" }}>token</span>={"{"}
-          signedJwt{"}"} {"/>"}
-        </code>
-      </pre>
+            {d.title}
+          </div>
+          <div style={{ height: 60 }}>
+            <Chart
+              config={sparkConfig}
+              data={{ rows: d.spark.map((v, i) => ({ i, v })) }}
+              height={60}
+            />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontSize: 11,
+              color: "var(--color-fg-subtle)",
+            }}
+          >
+            <span>{d.owner}</span>
+            <span>{d.updated}</span>
+          </div>
+        </Link>
+      ))}
     </div>
   );
 }
 
-function TerminalPreviewCard() {
+// ─── Alerts list ────────────────────────────────────────────────────
+function AlertList() {
   return (
-    <div
+    <ul
       style={{
-        background: "var(--color-bg-elev)",
-        border: "1px solid var(--color-border)",
-        borderRadius: "var(--radius-xl)",
-        padding: "var(--space-5)",
-        boxShadow: "var(--shadow-md)",
-        fontFamily: "var(--font-mono)",
-        fontSize: 12,
-        lineHeight: "var(--leading-relaxed)",
+        margin: 0,
+        padding: 0,
+        listStyle: "none",
+        display: "flex",
+        flexDirection: "column",
+        gap: 0,
       }}
     >
-      <div
-        style={{
-          color: "var(--color-fg-subtle)",
-          marginBottom: "var(--space-3)",
-          display: "flex",
-          alignItems: "center",
-          gap: "var(--space-2)",
-        }}
-      >
-        <TerminalSquare size={14} />
-        bash · single-binary install
-      </div>
-      <div style={{ color: "var(--color-fg)" }}>
-        <div>
-          <span style={{ color: "var(--color-cell-chart)" }}>$</span> curl -L
-          arcinsights.io/install | sh
-        </div>
-        <div style={{ color: "var(--color-fg-muted)" }}>
-          Verifying signature…{" "}
-          <span style={{ color: "var(--color-success)" }}>ok</span>
-        </div>
-        <div style={{ color: "var(--color-fg-muted)" }}>
-          Installed → /usr/local/bin/arc-insights
-        </div>
-        <div style={{ marginTop: "var(--space-2)" }}>
-          <span style={{ color: "var(--color-cell-chart)" }}>$</span>{" "}
-          arc-insights serve --license=./arc.lic
-        </div>
-        <div style={{ color: "var(--color-success)" }}>
-          ▸ Listening on 0.0.0.0:3000
-        </div>
-        <div style={{ color: "var(--color-fg-subtle)" }}>
-          ▸ Air-gapped · telemetry off · license 312 days
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CostPreviewCard() {
-  return (
-    <div
-      style={{
-        background: "var(--color-bg-elev)",
-        border: "1px solid var(--color-border)",
-        borderRadius: "var(--radius-xl)",
-        padding: "var(--space-5)",
-        boxShadow: "var(--shadow-md)",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "var(--space-3)",
-        }}
-      >
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 600,
-            letterSpacing: "0.06em",
-            textTransform: "uppercase",
-            color: "var(--color-fg-subtle)",
-          }}
-        >
-          Q3 budget · Snowflake
-        </span>
-        <span
-          style={{
-            fontSize: 12,
-            color: "var(--color-warning)",
-            fontWeight: 600,
-          }}
-        >
-          82% used
-        </span>
-      </div>
-      <div
-        style={{
-          height: 8,
-          background: "var(--color-bg-subtle)",
-          borderRadius: "var(--radius-full)",
-          overflow: "hidden",
-          marginBottom: "var(--space-4)",
-        }}
-      >
-        <div
-          style={{
-            width: "82%",
-            height: "100%",
-            background:
-              "linear-gradient(90deg, var(--color-primary), var(--color-warning))",
-          }}
-        />
-      </div>
-      {[
-        { label: "Daily report · acme-prod", cost: "$2.41" },
-        { label: "Pipeline anomaly digest", cost: "$0.92" },
-        { label: "Sales overview (auto-refresh)", cost: "$4.18" },
-        { label: "Top 100 dashboards (rollup)", cost: "$1.07" },
-      ].map((row) => (
-        <div
-          key={row.label}
+      {ALERTS.map((a, i) => (
+        <li
+          key={a.id}
           style={{
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "var(--space-2) 0",
-            borderTop: "1px solid var(--color-border)",
-            fontSize: 13,
-            color: "var(--color-fg-muted)",
+            alignItems: "flex-start",
+            gap: "var(--space-3)",
+            padding: "var(--space-4)",
+            borderBottom:
+              i === ALERTS.length - 1
+                ? "none"
+                : "1px solid var(--color-border)",
           }}
         >
-          <span>{row.label}</span>
+          <span
+            aria-hidden
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 8,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              background:
+                a.severity === "danger"
+                  ? "rgba(239, 68, 68, 0.12)"
+                  : "rgba(251, 191, 36, 0.12)",
+              color:
+                a.severity === "danger"
+                  ? "var(--color-danger)"
+                  : "var(--color-warning)",
+            }}
+          >
+            <AlertTriangle size={14} />
+          </span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: "var(--text-sm)",
+                fontWeight: 600,
+                color: "var(--color-fg)",
+                marginBottom: 2,
+              }}
+            >
+              {a.title}
+            </div>
+            <div style={{ fontSize: 12, color: "var(--color-fg-muted)" }}>
+              {a.body}
+            </div>
+          </div>
+          <span
+            style={{
+              fontSize: 11,
+              color: "var(--color-fg-subtle)",
+              flexShrink: 0,
+            }}
+          >
+            {a.time}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// ─── Activity list ─────────────────────────────────────────────────
+function ActivityList() {
+  return (
+    <ul
+      style={{
+        margin: 0,
+        padding: 0,
+        listStyle: "none",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {ACTIVITY.map((a, i) => (
+        <li
+          key={a.id}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "var(--space-3)",
+            padding: "var(--space-3) var(--space-4)",
+            borderBottom:
+              i === ACTIVITY.length - 1
+                ? "none"
+                : "1px solid var(--color-border)",
+          }}
+        >
+          <Avatar initials={a.who} />
+          <div
+            style={{
+              flex: 1,
+              minWidth: 0,
+              fontSize: "var(--text-sm)",
+              color: "var(--color-fg-muted)",
+            }}
+          >
+            <span style={{ color: "var(--color-fg)", fontWeight: 600 }}>
+              {a.who === "system" ? "System" : a.who}
+            </span>{" "}
+            {a.action}{" "}
+            <span style={{ color: "var(--color-fg)", fontWeight: 500 }}>
+              {a.target}
+            </span>
+          </div>
+          <span
+            style={{
+              fontSize: 11,
+              color: "var(--color-fg-subtle)",
+              flexShrink: 0,
+            }}
+          >
+            {a.time}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// ─── Data sources table ─────────────────────────────────────────────
+function DataSourceTable() {
+  return (
+    <div
+      style={{
+        background: "var(--color-bg-elev)",
+        border: "1px solid var(--color-border)",
+        borderRadius: "var(--radius-lg)",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 120px 120px 120px 120px",
+          gap: "var(--space-4)",
+          padding: "var(--space-3) var(--space-4)",
+          fontSize: 11,
+          fontWeight: 600,
+          letterSpacing: "0.06em",
+          textTransform: "uppercase",
+          color: "var(--color-fg-subtle)",
+          borderBottom: "1px solid var(--color-border)",
+          background: "var(--color-bg-subtle)",
+        }}
+      >
+        <span>Name</span>
+        <span>Type</span>
+        <span>Status</span>
+        <span>Latency</span>
+        <span>Cache hit</span>
+      </div>
+      {DATA_SOURCES.map((s, i) => (
+        <div
+          key={s.name}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 120px 120px 120px 120px",
+            gap: "var(--space-4)",
+            padding: "var(--space-3) var(--space-4)",
+            fontSize: "var(--text-sm)",
+            color: "var(--color-fg)",
+            alignItems: "center",
+            borderBottom:
+              i === DATA_SOURCES.length - 1
+                ? "none"
+                : "1px solid var(--color-border)",
+          }}
+        >
           <span
             style={{
               fontFamily: "var(--font-mono)",
-              color: "var(--color-success)",
-              fontWeight: 600,
+              fontSize: 13,
+              color: "var(--color-fg)",
             }}
           >
-            {row.cost}
+            {s.name}
+          </span>
+          <span style={{ color: "var(--color-fg-muted)" }}>{s.type}</span>
+          <span>
+            <StatusPill status={s.status} />
+          </span>
+          <span
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 12,
+              color: "var(--color-fg-muted)",
+            }}
+          >
+            {s.latency}
+          </span>
+          <span
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 12,
+              color: "var(--color-fg-muted)",
+            }}
+          >
+            {s.cache}
           </span>
         </div>
       ))}
@@ -662,207 +721,223 @@ function CostPreviewCard() {
   );
 }
 
-// ─── Stat strip ────────────────────────────────────────────────────
-function StatStrip() {
-  const stats = [
-    { label: "Features", value: "157" },
-    { label: "First-party connectors", value: "4 P0" },
-    { label: "p99 query (uncached)", value: "838 ms" },
-    { label: "License", value: "AGPLv3" },
-  ];
+// ─── Section wrapper ────────────────────────────────────────────────
+function Section({
+  title,
+  actions,
+  tight,
+  children,
+}: {
+  title: string;
+  actions?: React.ReactNode;
+  tight?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <section
       style={{
-        padding: "var(--space-12) var(--space-6)",
-        borderBottom: "1px solid var(--color-border)",
+        marginTop: tight ? 0 : "var(--space-10)",
       }}
     >
-      <div
+      <header
         style={{
-          maxWidth: 1080,
-          margin: "0 auto",
-          display: "grid",
-          gridTemplateColumns: `repeat(${stats.length}, 1fr)`,
-          gap: "var(--space-6)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "var(--space-4)",
         }}
       >
-        {stats.map((s) => (
-          <div key={s.label}>
-            <div
-              style={{
-                fontSize: "clamp(28px, 4vw, var(--text-2xl))",
-                fontWeight: 700,
-                letterSpacing: "-0.02em",
-                background:
-                  "linear-gradient(90deg, var(--color-fg), var(--color-primary))",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              {s.value}
-            </div>
-            <div
-              style={{
-                fontSize: 12,
-                color: "var(--color-fg-subtle)",
-                fontWeight: 500,
-                letterSpacing: "0.04em",
-                textTransform: "uppercase",
-                marginTop: "var(--space-1)",
-              }}
-            >
-              {s.label}
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-// ─── Big CTA ───────────────────────────────────────────────────────
-function BigCTA() {
-  return (
-    <section
-      style={{
-        padding: "var(--space-20) var(--space-6)",
-        background: "var(--gradient-hero)",
-        textAlign: "center",
-        borderBottom: "1px solid var(--color-border)",
-      }}
-    >
-      <div style={{ maxWidth: 720, margin: "0 auto" }}>
-        <Eyebrow>
-          <Sparkles size={12} />
-          Ship in five minutes
-        </Eyebrow>
         <h2
           style={{
-            margin: "var(--space-4) 0 0",
-            fontSize: "clamp(32px, 5vw, var(--text-3xl))",
-            fontWeight: 700,
-            letterSpacing: "-0.025em",
-            lineHeight: "var(--leading-tight)",
+            margin: 0,
+            fontSize: "var(--text-md)",
+            fontWeight: 600,
+            color: "var(--color-fg)",
+            letterSpacing: "-0.005em",
+            display: "flex",
+            alignItems: "center",
+            gap: "var(--space-2)",
           }}
         >
-          One command. Postgres, Valkey,
-          <br />
-          your dev loop alive.
+          <SectionIcon title={title} />
+          {title}
         </h2>
-        <pre
+        {actions}
+      </header>
+      {tight ? (
+        <div
           style={{
-            margin: "var(--space-6) auto 0",
-            display: "inline-block",
-            padding: "var(--space-3) var(--space-5)",
             background: "var(--color-bg-elev)",
             border: "1px solid var(--color-border)",
             borderRadius: "var(--radius-lg)",
-            fontFamily: "var(--font-mono)",
-            fontSize: 14,
-            color: "var(--color-fg)",
-            boxShadow: "var(--shadow-md)",
+            overflow: "hidden",
           }}
         >
-          <span style={{ color: "var(--color-fg-subtle)" }}>$</span>{" "}
-          <span style={{ color: "var(--color-primary)" }}>make</span> dev
-        </pre>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "var(--space-3)",
-            marginTop: "var(--space-6)",
-            flexWrap: "wrap",
-          }}
-        >
-          <CTAButton primary iconRight={<ArrowRight size={16} />}>
-            Read the quickstart
-          </CTAButton>
-          <CTAButton iconLeft={<KeyRound size={16} />}>Talk to sales</CTAButton>
+          {children}
         </div>
-      </div>
+      ) : (
+        children
+      )}
     </section>
   );
 }
 
-function FooterStrip() {
+function SectionIcon({ title }: { title: string }) {
+  const Icon =
+    title === "Pinned dashboards"
+      ? Star
+      : title === "Alerts needing attention"
+        ? Bell
+        : title === "Recent activity"
+          ? ActivityIcon
+          : title === "Data sources"
+            ? Database
+            : FileText;
   return (
-    <footer
+    <span
       style={{
-        padding: "var(--space-8) var(--space-6)",
-        textAlign: "center",
+        display: "inline-flex",
         color: "var(--color-fg-subtle)",
-        fontSize: 12,
       }}
     >
-      <div
-        style={{
-          maxWidth: 1080,
-          margin: "0 auto",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: "var(--space-4)",
-          flexWrap: "wrap",
-        }}
-      >
-        <span>© 2026 Arc Insights · AGPLv3</span>
-        <div style={{ display: "flex", gap: "var(--space-5)" }}>
-          <a href="/dashboard" style={{ color: "inherit" }}>
-            Notebook demo
-          </a>
-          <a href="/builder" style={{ color: "inherit" }}>
-            Builder
-          </a>
-          <a href="/sql" style={{ color: "inherit" }}>
-            SQL
-          </a>
-          <a
-            href="https://github.com/ixSurendra/arc-insights"
-            style={{ color: "inherit" }}
-          >
-            GitHub
-          </a>
-        </div>
-      </div>
-    </footer>
+      <Icon size={14} />
+    </span>
   );
 }
 
-// ─── Tiny shared bits ──────────────────────────────────────────────
-function Eyebrow({ children }: { children: React.ReactNode }) {
+// ─── Tiny components ────────────────────────────────────────────────
+function DeltaPill({
+  direction,
+  value,
+}: {
+  direction: "up" | "down" | "flat";
+  value: string;
+}) {
+  const tone =
+    direction === "up"
+      ? { bg: "rgba(52, 211, 153, 0.12)", fg: "var(--color-success)" }
+      : direction === "down"
+        ? { bg: "rgba(34, 211, 238, 0.12)", fg: "var(--color-primary)" }
+        : { bg: "var(--color-bg-subtle)", fg: "var(--color-fg-muted)" };
+  const Icon =
+    direction === "down"
+      ? ArrowDown
+      : direction === "up"
+        ? ArrowUp
+        : TrendingUp;
   return (
     <span
       style={{
         display: "inline-flex",
         alignItems: "center",
-        gap: "var(--space-2)",
-        padding: "4px var(--space-3)",
+        gap: 4,
+        padding: "2px 6px",
         borderRadius: "var(--radius-full)",
-        background: "var(--color-bg-elev)",
-        border: "1px solid var(--color-border)",
-        fontSize: 12,
-        fontWeight: 500,
-        color: "var(--color-fg-muted)",
-        letterSpacing: "0.02em",
+        background: tone.bg,
+        color: tone.fg,
+        fontSize: 11,
+        fontWeight: 600,
       }}
     >
-      {children}
+      <Icon size={10} />
+      {value}
     </span>
   );
 }
 
-function CTAButton({
-  children,
-  primary,
+function StatusPill({ status }: { status: "healthy" | "stale" | "error" }) {
+  const tone =
+    status === "healthy"
+      ? {
+          bg: "rgba(52, 211, 153, 0.14)",
+          fg: "var(--color-success)",
+          icon: CheckCircle2,
+          label: "Healthy",
+        }
+      : status === "stale"
+        ? {
+            bg: "rgba(251, 191, 36, 0.14)",
+            fg: "var(--color-warning)",
+            icon: AlertTriangle,
+            label: "Stale",
+          }
+        : {
+            bg: "rgba(248, 113, 113, 0.14)",
+            fg: "var(--color-danger)",
+            icon: AlertTriangle,
+            label: "Error",
+          };
+  const Icon = tone.icon;
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 6,
+        padding: "2px 8px",
+        borderRadius: "var(--radius-full)",
+        background: tone.bg,
+        color: tone.fg,
+        fontSize: 11,
+        fontWeight: 600,
+      }}
+    >
+      <Icon size={12} />
+      {tone.label}
+    </span>
+  );
+}
+
+function Avatar({ initials }: { initials: string }) {
+  if (initials === "system") {
+    return (
+      <span
+        style={{
+          width: 28,
+          height: 28,
+          borderRadius: "50%",
+          background: "var(--color-bg-subtle)",
+          color: "var(--color-fg-subtle)",
+          fontFamily: "var(--font-mono)",
+          fontSize: 12,
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        ⚙
+      </span>
+    );
+  }
+  return (
+    <span
+      style={{
+        width: 28,
+        height: 28,
+        borderRadius: "50%",
+        background:
+          "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
+        color: "var(--color-primary-fg)",
+        fontSize: 11,
+        fontWeight: 700,
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+      }}
+    >
+      {initials.slice(0, 2)}
+    </span>
+  );
+}
+
+function PrimaryAction({
   iconLeft,
-  iconRight,
+  children,
 }: {
-  children: React.ReactNode;
-  primary?: boolean;
   iconLeft?: React.ReactNode;
-  iconRight?: React.ReactNode;
+  children: React.ReactNode;
 }) {
   return (
     <button
@@ -871,26 +946,81 @@ function CTAButton({
         display: "inline-flex",
         alignItems: "center",
         gap: "var(--space-2)",
-        height: 44,
-        padding: "0 var(--space-5)",
-        fontFamily: "inherit",
-        fontSize: "var(--text-base)",
-        fontWeight: 600,
+        height: 36,
+        padding: "0 var(--space-4)",
+        background: "var(--color-primary)",
+        color: "var(--color-primary-fg)",
+        border: "1px solid var(--color-primary)",
         borderRadius: "var(--radius-md)",
+        fontFamily: "inherit",
+        fontSize: "var(--text-sm)",
+        fontWeight: 600,
         cursor: "pointer",
-        transition:
-          "background var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease), transform var(--motion-fast) var(--ease)",
-        background: primary ? "var(--color-primary)" : "var(--color-bg-elev)",
-        color: primary ? "var(--color-primary-fg)" : "var(--color-fg)",
-        border: primary
-          ? "1px solid var(--color-primary)"
-          : "1px solid var(--color-border)",
-        boxShadow: primary ? "var(--shadow-glow)" : "var(--shadow-sm)",
+        boxShadow: "var(--shadow-glow)",
       }}
     >
       {iconLeft}
       {children}
-      {iconRight}
     </button>
   );
+}
+
+function SecondaryAction({
+  iconLeft,
+  children,
+}: {
+  iconLeft?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "var(--space-2)",
+        height: 36,
+        padding: "0 var(--space-4)",
+        background: "var(--color-bg-elev)",
+        color: "var(--color-fg)",
+        border: "1px solid var(--color-border)",
+        borderRadius: "var(--radius-md)",
+        fontFamily: "inherit",
+        fontSize: "var(--text-sm)",
+        fontWeight: 500,
+        cursor: "pointer",
+      }}
+    >
+      {iconLeft}
+      {children}
+    </button>
+  );
+}
+
+function TextLink({ to, children }: { to: string; children: React.ReactNode }) {
+  return (
+    <Link
+      to={to}
+      style={{
+        fontSize: 12,
+        fontWeight: 500,
+        color: "var(--color-primary)",
+        textDecoration: "none",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 4,
+      }}
+    >
+      {children}
+      <ArrowRight size={12} />
+    </Link>
+  );
+}
+
+function formatDate(d: Date): string {
+  return d.toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
 }

@@ -266,3 +266,102 @@ pre {
 .arc-marquee:hover {
   animation-play-state: paused;
 }
+
+/* ─── Background pattern utilities ────────────────────────────────
+ * Hex layers texture under everything — dots, grids, soft mesh, and
+ * grain — to keep dark surfaces from reading flat. These are overlay
+ * patterns; a base background-color (or gradient) goes underneath.
+ */
+:root {
+  --pattern-dots: radial-gradient(
+      circle at 1px 1px,
+      rgba(15, 23, 42, 0.08) 1px,
+      transparent 0
+    )
+    0 0 / 24px 24px;
+
+  --pattern-grid:
+    linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px) 0 0 / 40px 40px,
+    linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px) 0 0 /
+      40px 40px;
+
+  --gradient-mesh:
+    radial-gradient(
+      900px 500px at 12% -10%,
+      rgba(8, 145, 178, 0.1),
+      transparent 60%
+    ),
+    radial-gradient(
+      700px 400px at 90% 0%,
+      rgba(14, 165, 233, 0.07),
+      transparent 60%
+    ),
+    radial-gradient(
+      600px 380px at 50% 110%,
+      rgba(13, 148, 136, 0.06),
+      transparent 60%
+    );
+
+  --pattern-noise: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+[data-theme="dark"] {
+  --pattern-dots: radial-gradient(
+      circle at 1px 1px,
+      rgba(232, 236, 243, 0.05) 1px,
+      transparent 0
+    )
+    0 0 / 24px 24px;
+
+  --pattern-grid:
+    linear-gradient(rgba(232, 236, 243, 0.025) 1px, transparent 1px) 0 0 / 40px
+      40px,
+    linear-gradient(90deg, rgba(232, 236, 243, 0.025) 1px, transparent 1px) 0
+      0 / 40px 40px;
+
+  --gradient-mesh:
+    radial-gradient(
+      1200px 600px at 12% -10%,
+      rgba(34, 211, 238, 0.1),
+      transparent 60%
+    ),
+    radial-gradient(
+      900px 500px at 90% 0%,
+      rgba(56, 189, 248, 0.08),
+      transparent 60%
+    ),
+    radial-gradient(
+      700px 450px at 50% 110%,
+      rgba(45, 212, 191, 0.06),
+      transparent 60%
+    );
+
+  --pattern-noise: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+.arc-bg-textured {
+  background: var(--pattern-dots), var(--gradient-mesh), var(--color-bg);
+}
+
+.arc-bg-grid {
+  background: var(--pattern-grid), var(--gradient-mesh), var(--color-bg);
+}
+
+.arc-bg-noise-layer {
+  position: relative;
+  isolation: isolate;
+}
+.arc-bg-noise-layer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--pattern-noise);
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  opacity: 0.5;
+  z-index: 0;
+}
+.arc-bg-noise-layer > * {
+  position: relative;
+  z-index: 1;
+}
