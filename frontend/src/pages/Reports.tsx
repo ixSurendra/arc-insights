@@ -1,13 +1,13 @@
 /**
- * Reports — Phase 1 skeleton. The flowing-document composer (P1-39),
- * exports (P1-40), schedule UI (P1-41), versioning (P1-42), and the 3
- * report templates (P1-43) all land in follow-up commits. This page
- * exists so the route + nav are wired and the empty-state CTA points
- * at the future composer.
+ * Reports — list page reads from the in-memory reports store. Click a
+ * row to open the editor; pick a template tile to start a new draft.
+ * Real persistence + scheduled delivery wires in P1-39 / P1-41 / P1-42.
  */
-import { FileText, Plus } from "lucide-react";
+import { CalendarClock, FileText, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { PageHeader } from "../layout/AppShell";
+import { useReports } from "../reports/store";
+import type { Cadence } from "../reports/types";
 import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import { Empty } from "../ui/Empty";
@@ -33,13 +33,22 @@ const TEMPLATES = [
   },
 ];
 
+const CADENCE_LABEL: Record<Cadence, string> = {
+  daily: "daily",
+  weekly: "weekly",
+  monthly: "monthly",
+  quarterly: "quarterly",
+};
+
 export function ReportsPage() {
+  const reports = useReports((s) => s.reports);
+
   return (
     <div style={{ padding: "var(--space-5) var(--space-6)" }}>
       <PageHeader
         breadcrumb="Workspace · Acme · Reports"
         title="Reports"
-        description="Flowing documents that combine widgets and prose. Schedule them as PDF emails, version each run, embed read-only. Composer + schedule UI land with P1-39 / P1-41."
+        description="Flowing documents that combine widgets and prose. Schedule them as PDF emails, version each run, embed read-only. Delivery wires in Phase 2 (P2-13)."
         actions={
           <Link to="/reports/new" style={{ textDecoration: "none" }}>
             <Button variant="primary" iconLeft={<Plus size={14} />}>
@@ -71,6 +80,7 @@ export function ReportsPage() {
           <Link
             key={t.id}
             to={`/reports/new?template=${t.id}`}
+            data-testid={`template-${t.id}`}
             className="arc-card-lift"
             style={{
               background: "var(--color-bg-elev)",
@@ -115,13 +125,113 @@ export function ReportsPage() {
       >
         Your reports
       </h2>
-      <Card padded={false}>
-        <Empty
-          icon={<FileText size={28} />}
-          title="No reports yet"
-          description="Pick a template above, or build from scratch. Reports compose widgets with prose and ship as PDFs, scheduled emails, or embedded URLs."
-        />
-      </Card>
+
+      {reports.length === 0 ? (
+        <Card padded={false}>
+          <Empty
+            icon={<FileText size={28} />}
+            title="No reports yet"
+            description="Pick a template above, or build from scratch."
+          />
+        </Card>
+      ) : (
+        <Card padded={false}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1.6fr 1fr 1fr 0.8fr",
+              gap: "var(--space-4)",
+              padding: "var(--space-3) var(--space-4)",
+              fontSize: 11,
+              fontWeight: 600,
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              color: "var(--color-fg-subtle)",
+              borderBottom: "1px solid var(--color-border)",
+              background: "var(--color-bg-subtle)",
+            }}
+          >
+            <span>Name</span>
+            <span>Folder</span>
+            <span>Schedule</span>
+            <span>Last edited</span>
+          </div>
+          {reports.map((r) => (
+            <Link
+              key={r.id}
+              to={`/reports/${r.id}`}
+              data-testid={`report-${r.id}`}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1.6fr 1fr 1fr 0.8fr",
+                gap: "var(--space-4)",
+                padding: "var(--space-3) var(--space-4)",
+                alignItems: "center",
+                borderBottom: "1px solid var(--color-border)",
+                fontSize: "var(--text-sm)",
+                color: "var(--color-fg)",
+                textDecoration: "none",
+              }}
+            >
+              <span>
+                <span
+                  style={{
+                    fontWeight: 600,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "var(--space-2)",
+                  }}
+                >
+                  <FileText
+                    size={12}
+                    style={{ color: "var(--color-fg-muted)" }}
+                  />
+                  {r.name}
+                </span>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: "var(--color-fg-subtle)",
+                    marginTop: 2,
+                  }}
+                >
+                  v{r.version} · {r.blocks.length} blocks
+                </div>
+              </span>
+              <span style={{ color: "var(--color-fg-muted)" }}>
+                {r.folder ?? "—"}
+              </span>
+              <span style={{ color: "var(--color-fg-muted)" }}>
+                {r.schedule?.enabled ? (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      fontSize: 11,
+                      color: "var(--color-success)",
+                    }}
+                  >
+                    <CalendarClock size={11} />
+                    {CADENCE_LABEL[r.schedule.cadence]} · {r.schedule.time}
+                  </span>
+                ) : (
+                  <span style={{ fontSize: 11 }}>Not scheduled</span>
+                )}
+              </span>
+              <span
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 11,
+                  color: "var(--color-fg-subtle)",
+                }}
+              >
+                {new Date(r.updatedAt).toLocaleDateString()}
+              </span>
+            </Link>
+          ))}
+        </Card>
+      )}
     </div>
   );
 }
